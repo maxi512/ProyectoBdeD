@@ -23,6 +23,83 @@ CREATE TABLE vuelos_programados(
 ) ENGINE= InnoDB;
 
 
+CREATE TABLE salidas(
+	vuelo VARCHAR(50) NOT NULL,
+	dia ENUM('Do','Lu','Ma','Mi','Ju','Vi','Sa'),
+	hora_sale SMALLINT NOT NULL,
+	hora_llega SMALLINT NOT NULL,
+	modelo_avion VARCHAR(50) NOT NULL,
+	
+	CONSTRAINT pk_salidas
+	PRIMARY KEY (vuelo,dia),
+	
+	CONSTRAINT FK_salidas_vuelo
+	FOREIGN KEY (vuelo) REFERENCES vuelos_programados(numero),
+	
+	CONSTRAINT FK_salidas_modelo_avion
+	FOREIGN KEY (modelo_avion) REFERENCES modelos_avion(modelo)
+	
+)ENGINE= InnoDB;
+
+CREATE TABLE instancias_vuelo(
+	vuelo VARCHAR(50) NOT NULL,
+	fecha DATE NOT NULL,
+	dia ENUM('Do','Lu','Ma','Mi','Ju','Vi','Sa'), 
+	estado VARCHAR (50) NOT NULL,
+	
+	CONSTRAINT pk_instancias_vuelo
+	PRIMARY KEY (vuelo,fecha),
+	
+	CONSTRAINT FK_instancias_vuelo_vuelo_salida
+	FOREIGN KEY (vuelo,dia) REFERENCES salidas(vuelo,dia)
+	
+	
+) ENGINE= InnoDB;
+
+CREATE TABLE aeropuertos(
+	codigo VARCHAR(20) NOT NULL,
+	nombre VARCHAR(50) NOT NULL,
+	telefono VARCHAR(20),
+	direccion VARCHAR(50) NOT NULL,
+	pais VARCHAR(30) NOT NULL,
+	estado VARCHAR(30) NOT NULL,
+	ciudad VARCHAR(30) NOT NULL,
+	
+	CONSTRAINT pk_aeropuertos
+	PRIMARY KEY (codigo),
+	
+	CONSTRAINT FK_aeropuertos_ubicacion
+	FOREIGN KEY (pais,estado,ciudad) REFERENCES ubicaciones(pais,estado,ciudad)
+	
+)ENGINE= InnoDB;
+
+CREATE TABLE ubicaciones(
+	pais VARCHAR(30) NOT NULL,
+	estado VARCHAR(30) NOT NULL,
+	ciudad VARCHAR(30) NOT NULL,
+	huso SMALLINT NOT NULL,
+	
+	CONSTRAINT pk_ubicaciones
+	PRIMARY KEY (pais,estado,ciudad)
+		
+)ENGINE= InnoDB;
+
+CREATE TABLE modelos_avion(
+	modelo VARCHAR(50) NOT NULL,
+	fabricante VARCHAR(50) NOT NULL,
+	cabinas SMALLINT unsigned NOT NULL,
+	cant_asientos SMALLINT unsigned NOT NULL,
+	
+	CONSTRAINT pk_modelos_avion
+	PRIMARY KEY (modelo)
+	
+)ENGINE= InnoDB;
+
+CREATE TABLE clases(
+	nombre VARCHAR(50) NOT NULL,
+	porcentaje FLOAT(3,2)
+)ENGINE= InnoDB;
+
 CREATE TABLE comodidades(
 	codigo INT NOT NULL,
 	descripcion VARCHAR(50),

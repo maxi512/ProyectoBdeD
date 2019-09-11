@@ -6,6 +6,92 @@ USE vuelos;
 
 #Creacion Tablas para las entidades
 
+
+CREATE TABLE comodidades(
+	codigo INT NOT NULL,
+	descripcion VARCHAR(50),
+
+	CONSTRAINT pk_comodidades
+	PRIMARY KEY (codigo)
+
+)ENGINE = InnoDB;
+
+CREATE TABLE clases(
+	nombre VARCHAR(50) NOT NULL,
+	porcentaje FLOAT(3,2)
+)ENGINE= InnoDB;
+
+CREATE TABLE ubicaciones(
+	pais VARCHAR(30) NOT NULL,
+	estado VARCHAR(30) NOT NULL,
+	ciudad VARCHAR(30) NOT NULL,
+	huso SMALLINT NOT NULL,
+	
+	CONSTRAINT pk_ubicaciones
+	PRIMARY KEY (pais,estado,ciudad)
+		
+)ENGINE= InnoDB;
+
+CREATE TABLE pasajeros(
+	doc_tipo VARCHAR(50) NOT NULL,
+	doc_nro INT UNSIGNED NOT NULL,
+	apellido VARCHAR(50) NOT NULL,
+	nombre VARCHAR(50) NOT NULL,
+	direccion VARCHAR(50) NOT NULL,
+	telefono VARCHAR(50) NOT NULL,
+	nacionalidad VARCHAR(50) NOT NULL,
+
+	CONSTRAINT pk_doc_pasajeros
+	PRIMARY KEY (doc_tipo,doc_nro)
+
+)ENGINE = InnoDB;
+
+CREATE TABLE modelos_avion(
+	modelo VARCHAR(50) NOT NULL,
+	fabricante VARCHAR(50) NOT NULL,
+	cabinas SMALLINT unsigned NOT NULL,
+	cant_asientos SMALLINT unsigned NOT NULL,
+	
+	CONSTRAINT pk_modelos_avion
+	PRIMARY KEY (modelo)
+	
+)ENGINE= InnoDB;
+
+CREATE TABLE empleados(
+
+	legajo INT UNSIGNED NOT NULL,
+	doc_tipo VARCHAR(50) NOT NULL,
+	doc_nro INT UNSIGNED NOT NULL,
+	password VARCHAR(32) NOT NULL,
+	apellido VARCHAR(50) NOT NULL,
+	nombre VARCHAR(50) NOT NULL,
+	direccion VARCHAR(50) NOT NULL,
+	telefono VARCHAR(50) NOT NULL,
+
+	CONSTRAINT pk_empleados
+	PRIMARY KEY (legajo)
+
+)ENGINE = InnoDB;
+
+
+CREATE TABLE aeropuertos(
+	codigo VARCHAR(20) NOT NULL,
+	nombre VARCHAR(50) NOT NULL,
+	telefono VARCHAR(20),
+	direccion VARCHAR(50) NOT NULL,
+	pais VARCHAR(30) NOT NULL,
+	estado VARCHAR(30) NOT NULL,
+	ciudad VARCHAR(30) NOT NULL,
+	
+	CONSTRAINT pk_aeropuertos
+	PRIMARY KEY (codigo),
+	
+	CONSTRAINT FK_aeropuertos_ubicacion
+	FOREIGN KEY (pais,estado,ciudad) REFERENCES ubicaciones(pais,estado,ciudad)
+	
+)ENGINE= InnoDB;
+
+
 CREATE TABLE vuelos_programados(
 	numero VARCHAR(50) NOT NULL,
 	aeropuerto_salida VARCHAR(50) NOT NULL,
@@ -56,90 +142,6 @@ CREATE TABLE instancias_vuelo(
 	
 ) ENGINE= InnoDB;
 
-CREATE TABLE aeropuertos(
-	codigo VARCHAR(20) NOT NULL,
-	nombre VARCHAR(50) NOT NULL,
-	telefono VARCHAR(20),
-	direccion VARCHAR(50) NOT NULL,
-	pais VARCHAR(30) NOT NULL,
-	estado VARCHAR(30) NOT NULL,
-	ciudad VARCHAR(30) NOT NULL,
-	
-	CONSTRAINT pk_aeropuertos
-	PRIMARY KEY (codigo),
-	
-	CONSTRAINT FK_aeropuertos_ubicacion
-	FOREIGN KEY (pais,estado,ciudad) REFERENCES ubicaciones(pais,estado,ciudad)
-	
-)ENGINE= InnoDB;
-
-CREATE TABLE ubicaciones(
-	pais VARCHAR(30) NOT NULL,
-	estado VARCHAR(30) NOT NULL,
-	ciudad VARCHAR(30) NOT NULL,
-	huso SMALLINT NOT NULL,
-	
-	CONSTRAINT pk_ubicaciones
-	PRIMARY KEY (pais,estado,ciudad)
-		
-)ENGINE= InnoDB;
-
-CREATE TABLE modelos_avion(
-	modelo VARCHAR(50) NOT NULL,
-	fabricante VARCHAR(50) NOT NULL,
-	cabinas SMALLINT unsigned NOT NULL,
-	cant_asientos SMALLINT unsigned NOT NULL,
-	
-	CONSTRAINT pk_modelos_avion
-	PRIMARY KEY (modelo)
-	
-)ENGINE= InnoDB;
-
-CREATE TABLE clases(
-	nombre VARCHAR(50) NOT NULL,
-	porcentaje FLOAT(3,2)
-)ENGINE= InnoDB;
-
-CREATE TABLE comodidades(
-	codigo INT NOT NULL,
-	descripcion VARCHAR(50),
-
-	CONSTRAINT pk_comodidades
-	PRIMARY KEY (codigo)
-
-)ENGINE = InnoDB
-
-CREATE TABLE pasajeros(
-	doc_tipo VARCHAR(50) NOT NULL,
-	doc_nro INT NOT NULL UNSIGNED,
-	apellido VARCHAR(50) NOT NULL,
-	nombre VARCHAR(50) NOT NULL,
-	direccion VARCHAR(50) NOT NULL,
-	telefono VARCHAR(50) NOT NULL,
-	nacionalidad VARCHAR(50) NOT NULL,
-
-	CONSTRAINT pk_doc_pasajeros
-	PRIMARY KEY (doc_tipo,doc_nro)
-
-)ENGINE = InnoDB;
-
-
-CREATE TABLE empleados(
-
-	legajo INT UNSIGNED NOT NULL,
-	doc_tipo VARCHAR(50) NOT NULL,
-	doc_nro INT UNSIGNED NOT NULL,
-	password VARCHAR(32) NOT NULL,
-	apellido VARCHAR(50) NOT NULL,
-	nombre VARCHAR(50) NOT NULL,
-	direccion VARCHAR(50) NOT NULL,
-	telefono VARCHAR(50) NOT NULL,
-
-	CONSTRAINT pk_empleados
-	PRIMARY KEY (legajo)
-
-)ENGINE = InnoDB;
-
 
 CREATE TABLE reservas(
 
@@ -149,7 +151,7 @@ CREATE TABLE reservas(
 	estado VARCHAR(50) NOT NULL,
 
 	doc_tipo VARCHAR(50) NOT NULL,
-	doc_nro INT NOT NULL UNSIGNED,
+	doc_nro INT UNSIGNED NOT NULL,
 
 	legajo INT UNSIGNED NOT NULL,
 
@@ -158,14 +160,15 @@ CREATE TABLE reservas(
 
 
 	CONSTRAINT FK_doc_pasajeros
-	FOREIGN KEY (doc_nro, doc_tipo) REFERENCES pasajeros (doc_tipo,doc_nro)
+	FOREIGN KEY (doc_nro,doc_tipo) REFERENCES pasajeros(doc_nro,doc_tipo)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 
 	CONSTRAINT FK_legajo_reservas
-	FOREIGN KEY (legajo) REFERENCES empleados (legajo)
+	FOREIGN KEY (legajo) REFERENCES empleados(legajo)
 		ON DELETE RESTRICT ON UPDATE CASCADE
 
 )Engine = InnoDB;
+
 
 CREATE TABLE brinda(
 
@@ -174,6 +177,9 @@ CREATE TABLE brinda(
 	clase VARCHAR(50) NOT NULL,
 	precio FLOAT(7,5) NOT NULL,
 	cant_asientos INT UNSIGNED NOT NULL,
+	
+	CONSTRAINT pk_brinda
+	PRIMARY KEY (vuelo,dia,clase),
 
 	CONSTRAINT FK_vuelo_brinda
 	FOREIGN KEY (vuelo,dia) REFERENCES salidas(vuelo,dia)
@@ -186,14 +192,14 @@ CREATE TABLE brinda(
 
 )Engine = InnoDB;
 
-
-
 CREATE TABLE posee(
 
 	clase VARCHAR(50) NOT NULL,
 	comodidad INT NOT NULL,
 
-
+	CONSTRAINT pk_posee
+	PRIMARY KEY (clase,comodidad),
+	
 	CONSTRAINT FK_clase_posee
 	FOREIGN KEY (clase) REFERENCES clases(nombre)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -212,7 +218,10 @@ CREATE TABLE reserva_vuelo_clase(
 	fecha_vuelo DATE NOT NULL,
 	clase VARCHAR(50) NOT NULL,
 
+	CONSTRAINT pk_reserva_vuelo_clase
+	PRIMARY KEY (numero,vuelo,fecha_vuelo),
 
+	
 	CONSTRAINT FK_numerorva_reserva_vuelo_clase
 	FOREIGN KEY (numero) REFERENCES reservas(numero)
 		ON DELETE RESTRICT ON UPDATE CASCADE,

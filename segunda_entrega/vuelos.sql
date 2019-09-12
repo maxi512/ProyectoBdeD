@@ -76,6 +76,7 @@ CREATE TABLE empleados(
 
 )ENGINE = InnoDB;
 
+
 CREATE TABLE aeropuertos(
 	codigo VARCHAR(20) NOT NULL,
 	nombre VARCHAR(50) NOT NULL,
@@ -93,13 +94,14 @@ CREATE TABLE aeropuertos(
 	
 )ENGINE= InnoDB;
 
+
 CREATE TABLE vuelos_programados(
 	numero VARCHAR(50) NOT NULL,
 	aeropuerto_salida VARCHAR(50) NOT NULL,
 	aeropuerto_llegada VARCHAR(50) NOT NULL,
 
 	CONSTRAINT pk_vuelos_programados
-	PRIMARY KEY (numero),
+	PRIMARY KEY(numero),
 
 	CONSTRAINT FK_vuelos_programados_aeropuerto_salidas
 	FOREIGN KEY (aeropuerto_salida) REFERENCES aeropuertos (codigo),
@@ -108,6 +110,7 @@ CREATE TABLE vuelos_programados(
 	FOREIGN KEY (aeropuerto_llegada) REFERENCES aeropuertos (codigo)
 
 ) ENGINE= InnoDB;
+
 
 CREATE TABLE salidas(
 	vuelo VARCHAR(50) NOT NULL,
@@ -139,7 +142,10 @@ CREATE TABLE instancias_vuelo(
 	CONSTRAINT FK_instancias_vuelo_vuelo_salida
 	FOREIGN KEY (vuelo,dia) REFERENCES salidas(vuelo,dia)
 	
+	
 ) ENGINE= InnoDB;
+
+
 
 CREATE TABLE reservas(
 	numero INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -165,6 +171,7 @@ CREATE TABLE reservas(
 		ON DELETE RESTRICT ON UPDATE CASCADE
 
 )Engine = InnoDB;
+
 
 CREATE TABLE brinda(
 	vuelo VARCHAR(50) NOT NULL,
@@ -216,16 +223,40 @@ CREATE TABLE reserva_vuelo_clase(
 	CONSTRAINT pk_reserva_vuelo_clase
 	PRIMARY KEY (numero,vuelo,fecha_vuelo),
 
+	CONSTRAINT FK_nombre_clase_reserva_vuelo_clase
+	FOREIGN KEY (clase) REFERENCES clases(nombre)
+		ON DELETE RESTRICT ON UPDATE CASCADE,
+
 	CONSTRAINT FK_instancia_reserva_vuelo_clase
-	FOREIGN KEY (vuelo,fecha_vuelo) REFERENCES instancias_vuelo(vuelo,fecha)
+	FOREIGN KEY (vuelo,fecha_vuelo) REFERENCES instacias_vuelo(vuelo,fecha)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 	
 	CONSTRAINT FK_numerorva_reserva_vuelo_clase
 	FOREIGN KEY (numero) REFERENCES reservas(numero)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	
-	CONSTRAINT FK_nombre_clase_reserva_vuelo_clase
-	FOREIGN KEY (clase) REFERENCES clases(nombre)
 		ON DELETE RESTRICT ON UPDATE CASCADE
-		
+
 )Engine = InnoDB;
+
+
+#USUARIO ADMIN
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
+GRANT ALL PRIVILEGES ON vuelos.* TO 'admin'@'localhost' WITH GRANT OPTION;
+
+#USUARIO EMPLEADO
+CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
+GRANT SELECT ON vuelos.* TO 'empleado'@'%';
+GRANT ALL PRIVILEGES ON vuelos.reservas, vuelos.pasajeros, vuelos.reserva_vuelo_clase 
+	TO 'empleado'@'%' WITH GRANT OPTION;
+
+#USUARIO CLIENTE
+CREATE USER 'cliente'@'%' IDENTIFIED BY 'cliente';
+
+##REALIZAR VISTA####
+
+
+
+
+
+
+
+

@@ -18,7 +18,11 @@ CREATE TABLE comodidades(
 
 CREATE TABLE clases(
 	nombre VARCHAR(50) NOT NULL,
-	porcentaje FLOAT(3,2)
+	porcentaje FLOAT(4,2),
+	
+	CONSTRAINT pk_clases
+	PRIMARY KEY (nombre)
+	
 )ENGINE= InnoDB;
 
 CREATE TABLE ubicaciones(
@@ -58,7 +62,6 @@ CREATE TABLE modelos_avion(
 )ENGINE= InnoDB;
 
 CREATE TABLE empleados(
-
 	legajo INT UNSIGNED NOT NULL,
 	doc_tipo VARCHAR(50) NOT NULL,
 	doc_nro INT UNSIGNED NOT NULL,
@@ -144,15 +147,14 @@ CREATE TABLE instancias_vuelo(
 
 
 CREATE TABLE reservas(
-
 	numero INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	fecha DATE NOT NULL,
 	vencimiento DATE NOT NULL,
 	estado VARCHAR(50) NOT NULL,
-
+	
 	doc_tipo VARCHAR(50) NOT NULL,
 	doc_nro INT UNSIGNED NOT NULL,
-
+	
 	legajo INT UNSIGNED NOT NULL,
 
 	CONSTRAINT pk_reservas
@@ -160,7 +162,7 @@ CREATE TABLE reservas(
 
 
 	CONSTRAINT FK_doc_pasajeros
-	FOREIGN KEY (doc_nro,doc_tipo) REFERENCES pasajeros(doc_nro,doc_tipo)
+	FOREIGN KEY (doc_tipo,doc_nro) REFERENCES pasajeros(doc_tipo,doc_nro)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 
 	CONSTRAINT FK_legajo_reservas
@@ -171,7 +173,6 @@ CREATE TABLE reservas(
 
 
 CREATE TABLE brinda(
-
 	vuelo VARCHAR(50) NOT NULL,
 	dia ENUM ("Do", "Lu", "Ma", "Mi", "Ju", "Vi","Sa"),
 	clase VARCHAR(50) NOT NULL,
@@ -217,22 +218,20 @@ CREATE TABLE reserva_vuelo_clase(
 	vuelo VARCHAR(50) NOT NULL,
 	fecha_vuelo DATE NOT NULL,
 	clase VARCHAR(50) NOT NULL,
-
+	
 	CONSTRAINT pk_reserva_vuelo_clase
 	PRIMARY KEY (numero,vuelo,fecha_vuelo),
 
-	
-	CONSTRAINT FK_numerorva_reserva_vuelo_clase
-	FOREIGN KEY (numero) REFERENCES reservas(numero)
+	CONSTRAINT FK_nombre_clase_reserva_vuelo_clase
+	FOREIGN KEY (clase) REFERENCES clases(nombre)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 
 	CONSTRAINT FK_instancia_reserva_vuelo_clase
 	FOREIGN KEY (vuelo,fecha_vuelo) REFERENCES instacias_vuelo(vuelo,fecha_vuelo)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
-
-
-	CONSTRAINT FK_nombre_clase_reserva_vuelo_clase
-	FOREIGN KEY (clase) REFERENCES clases(nombre)
+	
+	CONSTRAINT FK_numerorva_reserva_vuelo_clase
+	FOREIGN KEY (numero) REFERENCES reservas(numero)
 		ON DELETE RESTRICT ON UPDATE CASCADE
 
 )Engine = InnoDB;

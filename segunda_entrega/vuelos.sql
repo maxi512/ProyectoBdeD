@@ -8,8 +8,8 @@ USE vuelos;
 
 
 CREATE TABLE comodidades(
-	codigo INT NOT NULL,
-	descripcion VARCHAR(50),
+	codigo INT UNSIGNED NOT NULL,
+	descripcion TEXT NOT NULL,
 
 	CONSTRAINT pk_comodidades
 	PRIMARY KEY (codigo)
@@ -18,8 +18,7 @@ CREATE TABLE comodidades(
 
 CREATE TABLE clases(
 	nombre VARCHAR(50) NOT NULL,
-	porcentaje FLOAT NOT NULL
-	check (porcentaje BETWEEN 0.00 AND 0.99),
+	porcentaje DECIMAL(2,2) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_clases
 	PRIMARY KEY (nombre)
@@ -84,7 +83,7 @@ CREATE TABLE empleados(
 CREATE TABLE aeropuertos(
 	codigo VARCHAR(20) NOT NULL,
 	nombre VARCHAR(50) NOT NULL,
-	telefono VARCHAR(20),
+	telefono VARCHAR(20) NOT NULL,
 	direccion VARCHAR(50) NOT NULL,
 	pais VARCHAR(30) NOT NULL,
 	estado VARCHAR(30) NOT NULL,
@@ -101,6 +100,7 @@ CREATE TABLE aeropuertos(
 
 CREATE TABLE vuelos_programados(
 	numero VARCHAR(50) NOT NULL,
+	
 	aeropuerto_salida VARCHAR(50) NOT NULL,
 	aeropuerto_llegada VARCHAR(50) NOT NULL,
 
@@ -137,11 +137,11 @@ CREATE TABLE salidas(
 CREATE TABLE instancias_vuelo(
 	vuelo VARCHAR(50) NOT NULL,
 	fecha DATE NOT NULL,
-	dia ENUM('Do','Lu','Ma','Mi','Ju','Vi','Sa'), 
-	estado VARCHAR (50) NOT NULL,
+	dia ENUM('Do','Lu','Ma','Mi','Ju','Vi','Sa') NOT NULL, 
+	estado VARCHAR (50),
 	
 	CONSTRAINT pk_instancias_vuelo
-	PRIMARY KEY (vuelo,fecha),
+	PRIMARY KEY (vuelo,fecha,dia),
 	
 	CONSTRAINT FK_instancias_vuelo_vuelo_salida
 	FOREIGN KEY (vuelo,dia) REFERENCES salidas(vuelo,dia)
@@ -181,7 +181,7 @@ CREATE TABLE brinda(
 	vuelo VARCHAR(50) NOT NULL,
 	dia ENUM ("Do", "Lu", "Ma", "Mi", "Ju", "Vi","Sa"),
 	clase VARCHAR(50) NOT NULL,
-	precio FLOAT(7,2) NOT NULL,
+	precio DECIMAL(7,2) UNSIGNED NOT NULL,
 	cant_asientos INT UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_brinda
@@ -201,7 +201,7 @@ CREATE TABLE brinda(
 CREATE TABLE posee(
 
 	clase VARCHAR(50) NOT NULL,
-	comodidad INT NOT NULL,
+	comodidad INT UNSIGNED NOT NULL,
 
 	CONSTRAINT pk_posee
 	PRIMARY KEY (clase,comodidad),

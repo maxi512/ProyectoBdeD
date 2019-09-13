@@ -18,7 +18,8 @@ CREATE TABLE comodidades(
 
 CREATE TABLE clases(
 	nombre VARCHAR(50) NOT NULL,
-	porcentaje FLOAT(4,2),
+	porcentaje FLOAT NOT NULL
+	check (porcentaje BETWEEN 0.00 AND 0.99),
 	
 	CONSTRAINT pk_clases
 	PRIMARY KEY (nombre)
@@ -29,7 +30,10 @@ CREATE TABLE ubicaciones(
 	pais VARCHAR(30) NOT NULL,
 	estado VARCHAR(30) NOT NULL,
 	ciudad VARCHAR(30) NOT NULL,
-	huso SMALLINT NOT NULL,
+
+	##PREGUNTAR
+	huso SMALLINT NOT NULL
+	check(huso between -12 and 12),
 	
 	CONSTRAINT pk_ubicaciones
 	PRIMARY KEY (pais,estado,ciudad)
@@ -115,8 +119,8 @@ CREATE TABLE vuelos_programados(
 CREATE TABLE salidas(
 	vuelo VARCHAR(50) NOT NULL,
 	dia ENUM('Do','Lu','Ma','Mi','Ju','Vi','Sa'),
-	hora_sale SMALLINT NOT NULL,
-	hora_llega SMALLINT NOT NULL,
+	hora_sale TIME(4) NOT NULL,
+	hora_llega TIME(4) NOT NULL,
 	modelo_avion VARCHAR(50) NOT NULL,
 	
 	CONSTRAINT pk_salidas
@@ -177,7 +181,7 @@ CREATE TABLE brinda(
 	vuelo VARCHAR(50) NOT NULL,
 	dia ENUM ("Do", "Lu", "Ma", "Mi", "Ju", "Vi","Sa"),
 	clase VARCHAR(50) NOT NULL,
-	precio FLOAT(7,5) NOT NULL,
+	precio FLOAT(7,2) NOT NULL,
 	cant_asientos INT UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_brinda
@@ -228,7 +232,7 @@ CREATE TABLE reserva_vuelo_clase(
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 
 	CONSTRAINT FK_instancia_reserva_vuelo_clase
-	FOREIGN KEY (vuelo,fecha_vuelo) REFERENCES instacias_vuelo(vuelo,fecha)
+	FOREIGN KEY (vuelo,fecha_vuelo) REFERENCES instancias_vuelo(vuelo,fecha)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 	
 	CONSTRAINT FK_numerorva_reserva_vuelo_clase
@@ -237,23 +241,24 @@ CREATE TABLE reserva_vuelo_clase(
 
 )Engine = InnoDB;
 
-
 #USUARIO ADMIN
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
 GRANT ALL PRIVILEGES ON vuelos.* TO 'admin'@'localhost' WITH GRANT OPTION;
 
+
 #USUARIO EMPLEADO
 CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
 GRANT SELECT ON vuelos.* TO 'empleado'@'%';
-GRANT ALL PRIVILEGES ON vuelos.reservas, vuelos.pasajeros, vuelos.reserva_vuelo_clase 
-	TO 'empleado'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON vuelos.reservas TO 'empleado'@'%';
+GRANT ALL PRIVILEGES ON vuelos.pasajeros TO 'empleado'@'%';
+GRANT ALL PRIVILEGES ON vuelos.reserva_vuelo_clase TO 'empleado'@'%';
 
+/**
 #USUARIO CLIENTE
 CREATE USER 'cliente'@'%' IDENTIFIED BY 'cliente';
 
 ##REALIZAR VISTA####
-
-
+**/
 
 
 

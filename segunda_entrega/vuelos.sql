@@ -294,7 +294,7 @@ INSERT INTO clases VALUES ("Low Cost", 0.50);
 INSERT INTO ubicaciones VALUES ("Argentina", "Buenos Aires","Bahia Blanca", -3);
 INSERT INTO ubicaciones VALUES ("Argentina", "Buenos Aires","Buenos Aires", -3);
 INSERT INTO ubicaciones VALUES ("Argentina", "Santa Cruz","Rio Gallegos", -3);
-INSERT INTO ubicaciones VALUES ("Argentina", "Buenos Aires","Bahia Blanca", -3);
+INSERT INTO ubicaciones VALUES ("Argentina", "Buenos Aires","La Plata", -3);
 
 ##pasajeros
 INSERT INTO pasajeros VALUES ("DNI",41386475,"Montenegro","Maximiliano","Panama 323","2974933333","Argentino");
@@ -309,7 +309,7 @@ INSERT INTO modelos_avion VALUES ("333","Chevrolet",3,150);
 INSERT INTO modelos_avion VALUES ("A320","Airbus",4,200);
 
 #empleados
-INSERT INTO empleados VALUES (1,"DNI",40101010,"empleado1","Gomez","Mario","12 de Octubre 1010,"");
+INSERT INTO empleados VALUES (1,"DNI",40101010,"empleado1","Gomez","Mario","12 de Octubre 1010","291444444");
 INSERT INTO empleados VALUES (2,"DNI",20202020,"empleado2","Paez","Lautaro","Alsina 10","2974876333");
 INSERT INTO empleados VALUES (3,"DNI",40404040,"empleado3","Toledo","Pepe","Rivadavia 11","291345543");
 

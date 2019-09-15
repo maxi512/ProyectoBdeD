@@ -254,28 +254,28 @@ CREATE USER 'cliente'@'%' IDENTIFIED BY 'cliente';
 
 /**
 #Devuelve vuelo,clases del vuelo, precio, disponibles de cada vuelo;
-SELECT tabla1.vuelo,tabla1.clase, precio, ((cant_asientos*(1+porcentaje))-vendidos) as 'Disponibles' 
-FROM (SELECT ins.vuelo,ins.fecha,ins.dia,b.clase,precio,cant_asientos,porcentaje
+SELECT tabla1.vuelo,tabla1.clase, precio, ROUND((cant_asientos*(1+porcentaje))-vendidos) as 'Disponibles' 
+FROM  (SELECT ins.vuelo,ins.fecha,ins.dia,b.clase,precio,cant_asientos,porcentaje
 	  FROM instancias_vuelo ins, brinda b, clases c 
-      WHERE ins.vuelo=b.vuelo, ins.dia=b.dia, b.clase=c.clase) tabla1 JOIN
+      WHERE ins.vuelo=b.vuelo AND ins.dia=b.dia AND b.clase=c.nombre) tabla1 JOIN
 	  (SELECT ins.vuelo,ins.fecha,ins.dia,clase,count(clase) vendidos 
-	   FROM instancias_vuelo ins JOIN reserva_vuelo_clase rvc ON ins.fecha=rvc.fecha,
-														  ins.vuelo=rvc.vuelo,
-	   GROUP BY clase) tabla2 ON tabla1.vuelo=tabla2.vuelo,
-								 tabla1.fecha=tabla2.fecha,
-								 tabla1.dia=tabla2.dia,
+	  FROM instancias_vuelo ins JOIN reserva_vuelo_clase rvc ON ins.fecha=rvc.fecha_vuelo AND
+																ins.vuelo=rvc.vuelo
+	   GROUP BY vuelo,fecha,dia,clase) tabla2 ON tabla1.vuelo=tabla2.vuelo AND
+								 tabla1.fecha=tabla2.fecha AND
+								 tabla1.dia=tabla2.dia AND
 								 tabla1.clase=tabla2.clase;
 
 #Devuelve informacion del vuelo
 SELECT sal.vuelo,ins.fecha,ins.dia,sal.modelo_avion,sal.hora_sale,sal.hora_llega,timediff('','')
-FROM salidas sal, instancias_vuelo ins
+FROM salidas sal, instancias_vuelo ins 
 WHERE sal.vuelo=ins.vuelo and sal.dia=ins.dia;
 
 
 #Devuelve informacion de los aeropuertos de llegada y salida
 SELECT ins.vuelo,ins.fecha,ins.dia,
-	    a_salida.codigo,a_salida.nombre,a_salida.ciudad,a_salida.pais, a_salida.estado,
-		a_llegada.codigo,a_llegada.nombre,a_llegada.ciudad,a_llegada.pais
+	   a_salida.codigo,a_salida.nombre,a_salida.ciudad,a_salida.pais, a_salida.estado,
+	   a_llegada.codigo,a_llegada.nombre,a_llegada.ciudad,a_llegada.pais, a_llegada.estado
 FROM instancias_vuelo ins, vuelos_programados v, aeropuertos a_salida,aeropuertos a_llegada
 WHERE ins.vuelo=v.numero and v.aeropuerto_salida= a_salida.codigo and v.aeropuerto_llegada=a_llegada.codigo
 **/

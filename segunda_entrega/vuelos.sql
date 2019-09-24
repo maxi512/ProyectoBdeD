@@ -137,7 +137,7 @@ CREATE TABLE instancias_vuelo(
 	estado VARCHAR (50),
 	
 	CONSTRAINT pk_instancias_vuelo
-	PRIMARY KEY (vuelo,fecha,dia),
+	PRIMARY KEY (vuelo,fecha),
 	
 	CONSTRAINT FK_instancias_vuelo_vuelo_salida
 	FOREIGN KEY (vuelo,dia) REFERENCES salidas(vuelo,dia)

@@ -1,13 +1,12 @@
 package baseProyecto;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -19,7 +18,8 @@ import java.sql.Statement;
 
 @SuppressWarnings("serial")
 public class VentanaConsultas extends javax.swing.JInternalFrame {
-	
+		
+	private JLabel lblTituloTablas,lblTituloAtributos;
 	
 	private JPanel pnlConsulta;
 	private JTextArea txtConsulta;
@@ -31,9 +31,14 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 	
 	protected Connection conexionBD = null;
 	
+	private JPanel pnlTablas;
+	private JList listaTablas, listaAtributos;
+	private JScrollPane scrollTablas,scrollAtributos;
+	
 	public VentanaConsultas() {
 		super();
 		initGUI();
+		
 	}
 	
 	private void initGUI() {
@@ -94,12 +99,76 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
         	
         	tabla = new JTable();
         	scrTabla.setViewportView(tabla);
-        	        	
+        	
+        	
+        	/////////////////////////////////
+        	pnlTablas = new JPanel();
+        	pnlTablas.setLayout(new GridLayout(1,1));
+        	getContentPane().add(pnlTablas,BorderLayout.SOUTH);
+        	
+        	scrollTablas= new JScrollPane();
+        	scrollAtributos= new JScrollPane();
+        	
+        	pnlTablas.add(scrollTablas);
+        	pnlTablas.add(scrollAtributos);
+        	
+        	lblTituloTablas = new JLabel("Tablas Base de Datos Vuelos");
+			lblTituloTablas.setFont(new Font("Dialog", Font.BOLD, 13));
+			scrollTablas.setColumnHeaderView(lblTituloTablas);
+			
+			lblTituloAtributos = new JLabel("Atributos de la Tabla: ");
+			lblTituloAtributos.setFont(new Font("Dialog", Font.BOLD, 13));
+			scrollAtributos.setColumnHeaderView(lblTituloAtributos);
+			
+
+        	
+        	conectarBD();
+        	Statement stmt = this.conexionBD.createStatement();
+			String sql= "SHOW TABLES;";
+			ResultSet rs= stmt.executeQuery(sql);
+			
+						
+        	String nombres []= obtenerContenidoFilas(rs);
+        	listaTablas= new JList(nombres);
+        	
+        	listaTablas.addListSelectionListener(new ListSelectionListener() {
+        	      
+        		public void valueChanged(ListSelectionEvent evt) {
+        	        listaTablasValueChanged(evt);
+    	        }
+        		
+        	});
+        	
+        	listaAtributos= new JList();
+        	
+        	scrollTablas.setViewportView(listaTablas);
+        	scrollAtributos.setViewportView(listaAtributos);
+        	
         	pack();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void listaTablasValueChanged(ListSelectionEvent evt) {
+		String atributos []= null;
+		String itemSeleccionado = (String) listaTablas.getSelectedValue();
+		String headerScroll= "Atributos de la Tabla: "+itemSeleccionado;
+		try {
+			Statement stmt = this.conexionBD.createStatement();
+			String sql= "DESCRIBE "+itemSeleccionado+";";
+			ResultSet rs= stmt.executeQuery(sql);
+			atributos = obtenerContenidoFilas(rs);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		lblTituloAtributos.setText(headerScroll);
+		scrollAtributos.setColumnHeaderView(lblTituloAtributos);
+		listaAtributos.setListData(atributos);
 	}
 	
 	private void btnEjecutarActionPerformed(ActionEvent evt) {
@@ -166,7 +235,13 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 				
 				columnas = obtenerNombreColumnas(resultado);
 				
-				TableModel BarcosModel = new DefaultTableModel(new String [][] {}, columnas);
+				TableModel BarcosModel = new DefaultTableModel(new String [][] {}, columnas) {
+					@Override
+					public boolean isCellEditable(int row, int column) {
+						return false;
+					}
+				};
+				
 				
 				tabla.setModel(BarcosModel);
 				tabla.setAutoCreateRowSorter(true);
@@ -206,5 +281,25 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 			e.printStackTrace();
 		}
 		return columnas;
+	}
+	
+	private String[] obtenerContenidoFilas(ResultSet tabla) {
+		String nombres[]=null;
+		int cantFilas=0,i=0;
+		try {
+			if(tabla.last()){ //Nos posicionamos al final
+		          cantFilas = tabla.getRow(); //sacamos la cantidad de filas
+		          tabla.beforeFirst(); //nos posicionamos antes del inicio (como viene por defecto)
+		     }
+			nombres= new String[cantFilas];
+			while(tabla.next()) {
+				nombres[i]= tabla.getString(1);
+				i++;
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return nombres;
 	}
 }

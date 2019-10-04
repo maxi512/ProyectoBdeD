@@ -296,7 +296,7 @@ GRANT ALL PRIVILEGES ON vuelos.* TO 'admin'@'localhost' WITH GRANT OPTION;
 #USUARIO EMPLEADO
 CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
 GRANT SELECT ON vuelos.* TO 'empleado'@'%';
-GRANT ALL PRIVILEGES ON vuelos.reservas TO 'empleado'@'%';
-GRANT ALL PRIVILEGES ON vuelos.pasajeros TO 'empleado'@'%';
-GRANT ALL PRIVILEGES ON vuelos.reserva_vuelo_clase TO 'empleado'@'%';
+GRANT SELECT, INSERT, UPDATE  ON vuelos.reservas TO 'empleado'@'%';
+GRANT SELECT, INSERT, UPDATE ON vuelos.pasajeros TO 'empleado'@'%';
+GRANT SELECT, INSERT, UPDATE ON vuelos.reserva_vuelo_clase TO 'empleado'@'%';
 

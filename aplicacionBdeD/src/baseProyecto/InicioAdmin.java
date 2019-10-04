@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 
 import javax.swing.*;
 
@@ -19,6 +20,7 @@ public class InicioAdmin extends javax.swing.JInternalFrame{
 	private JPasswordField password;
 	private JButton btnIniciarSesion;
 	private VentanaConsultas ventanaConsultas;
+
 	
 	/**
 	 * Create the application.
@@ -30,11 +32,12 @@ public class InicioAdmin extends javax.swing.JInternalFrame{
 	
 	private void initGUI() {
 		try {
-			setPreferredSize(new Dimension(400,200));
-			this.setBounds(50,50,400,300);
+			setPreferredSize(new Dimension(800,600));
+			this.setBounds(0,0,800,600);
 			setVisible(true);
 			BorderLayout thisLayout = new BorderLayout();
 			this.setTitle("Iniciar Sesion");
+			
 			getContentPane().setLayout(thisLayout);
 			this.setClosable(true);
 			this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
@@ -63,7 +66,7 @@ public class InicioAdmin extends javax.swing.JInternalFrame{
 			usuario.setColumns(10);
 	       
 			
-			JLabel lblContrasea = new JLabel("Contraseña");
+			JLabel lblContrasea = new JLabel("Password");
 			lblContrasea.setFont(new Font("Dialog", Font.BOLD, 13));
 			lblContrasea.setBounds(92, 123, 83, 15);
 			panelDatos.add(lblContrasea);	
@@ -86,7 +89,7 @@ public class InicioAdmin extends javax.swing.JInternalFrame{
 						
 					}
 					else {
-						JOptionPane.showMessageDialog(null, "Usuario o Contraseña incorrectos", "Error", JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Usuario o Contraseï¿½a incorrectos", "Error", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			});

@@ -185,14 +185,14 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 	
 	private void conectarBD() {
 		if (this.conexionBD == null) {           
-			try {  //se genera el string que define los datos de la conexión 
+			try {  
+				//se genera el string que define los datos de la conexiï¿½n 
 				String servidor = "localhost:3306";
 	            String baseDatos = "vuelos";
 	            String usuario = "admin";
 	            String clave = "admin";
-	            String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos + 
-	            		          "?serverTimezone=America/Argentina/Buenos_Aires";
-	            //se intenta establecer la conexión
+	            String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos + "?serverTimezone=America/Argentina/Buenos_Aires";
+	            //se intenta establecer la conexiï¿½n
 	            this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
 	         }
 	         catch (SQLException ex) {

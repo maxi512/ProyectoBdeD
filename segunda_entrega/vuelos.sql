@@ -242,44 +242,37 @@ create table usuarios(
 
 # CREACION DE LA VISTA
 CREATE VIEW vuelos_disponibles AS
-SELECT  info_vuelo.vuelo,info_vuelo.fecha,info_vuelo.dia,info_vuelo.modelo_avion,info_vuelo.hora_sale,info_vuelo.hora_llega,info_vuelo.Diferencia,
+SELECT	info_vuelo.vuelo,info_vuelo.fecha,info_vuelo.dia,info_vuelo.modelo_avion,info_vuelo.hora_sale,info_vuelo.hora_llega,info_vuelo.Diferencia,
 		info_aeropuerto.codigo_salida,info_aeropuerto.nombre_salida,info_aeropuerto.ciudad_salida,info_aeropuerto.estado_salida,info_aeropuerto.pais_salida,
 		info_aeropuerto.codigo_llegada,info_aeropuerto.nombre_llegada,info_aeropuerto.ciudad_llegada,info_aeropuerto.estado_llegada,info_aeropuerto.pais_llegada,
-		info_disponibles.clase,info_disponibles.precio,info_disponibles.Disponibles
+		info_disponibles.clase,info_disponibles.precio,info_disponibles.cant_asientos,info_disponibles.asientos_disponibles
 		
-
-FROM 	(SELECT sal.vuelo,ins.fecha,ins.dia,sal.modelo_avion,sal.hora_sale,sal.hora_llega, if(timediff(sal.hora_llega,sal.hora_sale)<0,timediff(timediff(sal.hora_llega,sal.hora_sale),"-24:00"),timediff(sal.hora_llega,sal.hora_sale)) as 'Diferencia'
+FROM    (SELECT sal.vuelo,ins.fecha,ins.dia,sal.modelo_avion,sal.hora_sale,sal.hora_llega, if(timediff(sal.hora_llega,sal.hora_sale)<0,timediff(timediff(sal.hora_llega,sal.hora_sale),"-24:00"),timediff(sal.hora_llega,sal.hora_sale)) as 'Diferencia'
 		 FROM salidas sal, instancias_vuelo ins 
-		 WHERE sal.vuelo=ins.vuelo and sal.dia=ins.dia) info_vuelo,
+		 WHERE sal.vuelo=ins.vuelo and sal.dia=ins.dia) AS info_vuelo,
 		 
-		 (SELECT 	ins.vuelo,ins.fecha,ins.dia,
+		(SELECT 	ins.vuelo,ins.fecha,ins.dia,
 					a_salida.codigo codigo_salida,a_salida.nombre nombre_salida,a_salida.ciudad ciudad_salida,a_salida.pais pais_salida, a_salida.estado estado_salida,
 					a_llegada.codigo codigo_llegada,a_llegada.nombre nombre_llegada,a_llegada.ciudad ciudad_llegada,a_llegada.pais pais_llegada, a_llegada.estado estado_llegada
 		 FROM instancias_vuelo ins, vuelos_programados v, aeropuertos a_salida,aeropuertos a_llegada
-		 WHERE ins.vuelo=v.numero and v.aeropuerto_salida= a_salida.codigo and v.aeropuerto_llegada=a_llegada.codigo) info_aeropuerto,
-		 
-		(SELECT TABLA_Disponibles_clase.vuelo,TABLA_Disponibles_clase.fecha,TABLA_Disponibles_clase.dia,TABLA_Disponibles_clase.clase,precio, ROUND((cant_asientos*(1+porcentaje))-Vendidos) as 'Disponibles' 
-		 FROM	(SELECT tabla1.vuelo,tabla1.fecha,tabla1.dia,tabla1.clase,IF(tabla1.clase=tabla2.clase,vendidos,0) Vendidos	
-				 FROM   (SELECT ins.vuelo,ins.fecha,ins.dia,b.clase,precio,cant_asientos,porcentaje
-						 FROM instancias_vuelo ins, brinda b, clases c 
-						 WHERE ins.vuelo=b.vuelo AND ins.dia=b.dia AND b.clase=c.nombre) tabla1,
-				
-						(SELECT ins.vuelo,ins.fecha,ins.dia,clase,count(clase) vendidos 
-						 FROM instancias_vuelo ins JOIN reserva_vuelo_clase rvc ON ins.fecha=rvc.fecha_vuelo AND
-																ins.vuelo=rvc.vuelo
-						 GROUP BY vuelo,fecha,dia,clase) tabla2
-				
-				 WHERE tabla1.vuelo=tabla2.vuelo AND	 tabla1.fecha=tabla2.fecha AND tabla1.dia=tabla2.dia) TABLA_Vendidos_por_clase,
+		 WHERE ins.vuelo=v.numero and v.aeropuerto_salida= a_salida.codigo and v.aeropuerto_llegada=a_llegada.codigo) AS info_aeropuerto,
 		
-				(SELECT ins.vuelo,ins.fecha,ins.dia,b.clase,precio,cant_asientos,porcentaje
+		(SELECT total_disponibles.vuelo,total_disponibles.fecha,total_disponibles.dia,total_disponibles.clase,precio,
+				FLOOR(cant_asientos*(1+porcentaje)) AS cant_asientos,
+				IFNULL( FLOOR(cant_asientos*(1+porcentaje)-vendidos) , FLOOR(cant_asientos*(1+porcentaje)) ) AS asientos_disponibles
+		 FROM  (SELECT ins.vuelo,ins.fecha,ins.dia,b.clase,precio,cant_asientos,porcentaje
 				 FROM instancias_vuelo ins, brinda b, clases c 
-				 WHERE ins.vuelo=b.vuelo AND ins.dia=b.dia AND b.clase=c.nombre) TABLA_Disponibles_clase
-		 
-		 WHERE TABLA_Disponibles_clase.vuelo=TABLA_Vendidos_por_clase.vuelo 
-				AND TABLA_Disponibles_clase.fecha=TABLA_Vendidos_por_clase.fecha
-				AND TABLA_Disponibles_clase.dia=TABLA_Vendidos_por_clase.dia 
-				AND TABLA_Disponibles_clase.clase=TABLA_Vendidos_por_clase.clase)  info_disponibles
-				
+				 WHERE ins.vuelo=b.vuelo AND ins.dia=b.dia AND b.clase=c.nombre) total_disponibles 
+				 
+			LEFT JOIN
+	 	
+				(SELECT vuelo,fecha_vuelo,clase,count(clase) vendidos 
+				 FROM reserva_vuelo_clase rvc
+				 GROUP BY vuelo,fecha_vuelo,clase) total_vendidos 
+				 
+			ON total_disponibles.vuelo=total_vendidos.vuelo AND total_disponibles.fecha = total_vendidos.fecha_vuelo 
+			   AND total_disponibles.clase=total_vendidos.clase) AS info_disponibles
+			
 WHERE	info_vuelo.vuelo=info_aeropuerto.vuelo AND info_aeropuerto.vuelo=info_disponibles.vuelo AND
 		info_vuelo.fecha=info_aeropuerto.fecha AND info_aeropuerto.fecha=info_disponibles.fecha AND
 		info_vuelo.dia=info_aeropuerto.dia AND info_aeropuerto.dia=info_disponibles.dia;

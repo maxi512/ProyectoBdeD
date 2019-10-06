@@ -233,6 +233,12 @@ CREATE TABLE reserva_vuelo_clase(
 
 )Engine = InnoDB;
 
+create table usuarios(
+	legajo INT UNSIGNED not null,
+	password CHAR(32),
+	primary key (legajo)
+	)Engine = InnoDB;
+
 
 # CREACION DE LA VISTA
 CREATE VIEW vuelos_disponibles AS
@@ -296,7 +302,7 @@ GRANT ALL PRIVILEGES ON vuelos.* TO 'admin'@'localhost' WITH GRANT OPTION;
 #USUARIO EMPLEADO
 CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
 GRANT SELECT ON vuelos.* TO 'empleado'@'%';
-GRANT SELECT, INSERT, UPDATE  ON vuelos.reservas TO 'empleado'@'%';
+GRANT SELECT, INSERT, UPDATE ON vuelos.reservas TO 'empleado'@'%';
 GRANT SELECT, INSERT, UPDATE ON vuelos.pasajeros TO 'empleado'@'%';
 GRANT SELECT, INSERT, UPDATE ON vuelos.reserva_vuelo_clase TO 'empleado'@'%';
 

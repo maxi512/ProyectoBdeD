@@ -83,3 +83,8 @@ INSERT INTO reserva_vuelo_clase VALUES(1001,"4000","2019:09:14","Premium");
 INSERT INTO reserva_vuelo_clase VALUES(1002,"4000","2019:09:14","Premium");
 INSERT INTO reserva_vuelo_clase VALUES(1003,"3000","2019:09:16","Low Cost");
 INSERT INTO reserva_vuelo_clase VALUES(1005,"4000","2019:09:21","Premium");
+
+#usuarios
+INSERT INTO usuarios VALUES(1,md5("empleado1"));
+INSERT INTO usuarios VALUES(2,md5("empleado2"));
+INSERT INTO usuarios VALUES(3,md5("empleado3"));

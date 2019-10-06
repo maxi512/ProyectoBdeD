@@ -1,4 +1,5 @@
 package baseProyecto;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -113,7 +114,7 @@ public class InicioEmpleado extends JFrame {
 				} catch (SQLException ex) {
 					String mensaje = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
 							+ "VendorError: " + ex.getErrorCode();
-					
+
 					mostrarMensajeError(mensaje);
 				}
 
@@ -123,8 +124,8 @@ public class InicioEmpleado extends JFrame {
 					try {
 						int legajoNumerico = Integer.parseInt(legajo);
 
-						String sql = "SELECT legajo, password FROM empleados WHERE legajo = " + legajo
-								+ " and password = '" + pass + "';";
+						String sql = "SELECT legajo, password FROM usuarios having legajo = " + legajoNumerico
+								+ " and password = md5('" + pass + "');";
 						String[] columnas = null;
 
 						boolean isResultSet = stmt.execute(sql);
@@ -145,8 +146,8 @@ public class InicioEmpleado extends JFrame {
 					} catch (NumberFormatException e) {
 						mostrarLegajoNoNumerico();
 					}
-					
-					//Es necesario cerrar conexion?
+
+					// Es necesario cerrar conexion?
 					cerrarConexion();
 
 				} catch (SQLException e) {
@@ -182,7 +183,7 @@ public class InicioEmpleado extends JFrame {
 			} catch (SQLException ex) {
 				String mensaje = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
 						+ "VendorError: " + ex.getErrorCode();
-				
+
 				mostrarMensajeError(mensaje);
 			}
 		}

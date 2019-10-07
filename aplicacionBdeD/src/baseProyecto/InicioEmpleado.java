@@ -147,8 +147,7 @@ public class InicioEmpleado extends JFrame {
 						mostrarLegajoNoNumerico();
 					}
 
-					// Es necesario cerrar conexion?
-					cerrarConexion();
+					
 
 				} catch (SQLException e) {
 					mostrarMensajeError(e.getMessage());

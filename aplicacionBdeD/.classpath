@@ -6,6 +6,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/maxi/eclipse-workspace/hola/mysql-connector-java-8.0.17.jar"/>
+	<classpathentry kind="lib" path="/home/maxi/Escritorio/uni/bases_de_datos/proyecto/aplicacionBdeD/src/mysql-connector-java-8.0.17.jar"/>
+	<classpathentry kind="lib" path="/home/maxi/Escritorio/uni/bases_de_datos/proyecto/aplicacionBdeD/src/quicktable-3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -233,6 +233,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 
 				tabla.setModel(BarcosModel);
 				tabla.setAutoCreateRowSorter(true);
+				tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 				((DefaultTableModel) this.tabla.getModel()).setRowCount(0);
 				int i = 0;
@@ -288,7 +289,4 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 		return nombres;
 	}
 
-	
-	
-	
 }

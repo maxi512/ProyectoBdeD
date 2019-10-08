@@ -47,21 +47,6 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 	private JFrame frame;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaInfoVuelos window = new VentanaInfoVuelos();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the application.
@@ -75,6 +60,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		
 		setPreferredSize(new Dimension(800,600));
 		this.setBounds(0,0,800,600);
 		setVisible(true);
@@ -84,7 +70,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		panel.setBounds(0, -27, 800, 600);
 		getContentPane().add(panel);
 		panel.setLayout(null);
-
+		
 		group = new ButtonGroup();
 
 		rdbtnIda = new JRadioButton("Solo Ida");
@@ -186,19 +172,19 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		JButton btnBuscarVuelos = new JButton("Buscar vuelos");
 		btnBuscarVuelos.setBounds(544, 197, 171, 31);
 		panel.add(btnBuscarVuelos);
-		
+
 		JLabel lblFechaIda = new JLabel("Fecha Ida");
 		lblFechaIda.setBounds(474, 95, 66, 15);
 		panel.add(lblFechaIda);
-		
+
 		JLabel lblFechaVuelta = new JLabel("Fecha Vuelta");
 		lblFechaVuelta.setBounds(474, 148, 111, 15);
 		panel.add(lblFechaVuelta);
-		
+
 		JLabel lblCiudadOrigen = new JLabel("Ciudad origen");
 		lblCiudadOrigen.setBounds(31, 37, 132, 15);
 		panel.add(lblCiudadOrigen);
-		
+
 		JLabel lblCiudadDestinoi = new JLabel("Ciudad destino");
 		lblCiudadDestinoi.setBounds(247, 37, 132, 15);
 		panel.add(lblCiudadDestinoi);
@@ -207,7 +193,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(verificarDatos()) {
+				if (verificarDatos()) {
 					refrescar();
 				}
 			}
@@ -275,35 +261,52 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	}
 
 	private void inicializarCampos() {
-		this.seleccionadoOrigen = -1;	
+		this.seleccionadoOrigen = -1;
 		this.seleccionadoDestino = -1;
 
-		this.txtFechaIda.setText("");
-		this.txtFechaVuelta.setText("");
 
 	}
 
 	private void refrescar() {
 		try {
 			Statement stmt = this.conexionBD.createStatement();
+			String ciudadOrigen = (String) listOrigen.getSelectedValue();
+			String ciudadDestino = (String) listDestino.getSelectedValue();
 
-			String sql = "select * \n"
-					+ "from instancias_vuelo, vuelos_programados natural join(select codigo aeropuerto_salida, ciudad ciudad_salida\n"
-					+ "from aeropuertos) salida natural join (\n"
-					+ "select codigo aeropuerto_llegada, ciudad ciudad_llegada\n" + "from aeropuertos\n" + ") llegada\n"
-					+ "where instancias_vuelo.vuelo = vuelos_programados.numero and ciudad_salida = '"
-					+ (String) listOrigen.getSelectedValue()+"' and ciudad_llegada = '"+ (String) listDestino.getSelectedValue()+"';";
+			java.sql.Date fechaIda = Fechas.convertirStringADateSQL(this.txtFechaIda.getText().trim());
+			java.sql.Date fechaVuelta = null;
+
+			String sql = "SELECT DISTINCT vuelo as 'Numero Vuelo',ciudad_salida as 'Ciudad Salida',nombre_salida as 'Aeropuerto Salida', hora_sale as 'Hora Salida',"
+					+ "ciudad_llegada as 'Ciudad Llegada', nombre_llegada as 'Aeropuerto Llegada', hora_llega as 'Hora Llegada', modelo_avion as 'Modelo de avion', Diferencia as 'Tiempo Estimado' "
+					+ "FROM vuelos_disponibles ";
+
+			String wheresql;
+
+			if (rdbtnIdayVuelta.isSelected()) {
+				fechaVuelta = Fechas.convertirStringADateSQL(this.txtFechaVuelta.getText().trim());
+				wheresql = "WHERE (ciudad_salida = \"" + ciudadOrigen + "\" AND ciudad_llegada = \"" + ciudadDestino + "\" AND " + "fecha = \"" + fechaIda + "\") OR "
+						+ "(ciudad_salida = \"" + ciudadDestino + "\" AND ciudad_llegada = \"" + ciudadOrigen + "\" AND " + "fecha = \"" + fechaVuelta + "\");";
+			} else {
+				wheresql = "WHERE ciudad_salida = \"" + ciudadOrigen + "\" AND ciudad_llegada = \"" + ciudadDestino
+						+ "\" AND fecha = \"" + fechaIda + "\";";
+			}
+
+			sql += wheresql;
 
 			ResultSet rs = stmt.executeQuery(sql);
 
 			// actualiza el contenido de la tabla con los datos del resulset rs
 			tabla.refresh(rs);
 
-			// setea el formato de visualización de la columna "fecha" a dia/mes/año
-			// tabla.getColumnByDatabaseName("fecha").setDateFormat("dd/MM/YYYY");
-
-			tabla.getColumnByDatabaseName("fecha").setMinWidth(80);
-
+			// setea el formato de visualizacion de las columnas "Hora Salida", "Hora Llegada" y "Tiempo Estimado" a Hora:Minuto
+			tabla.getColumnByDatabaseName("Hora Salida").setDateFormat("HH:mm");
+			
+			tabla.getColumnByDatabaseName("Hora Llegada").setDateFormat("HH:mm");
+			
+			tabla.getColumnByDatabaseName("Tiempo Estimado").setDateFormat("HH:mm");
+			tabla.getColumnByDatabaseName("Tiempo Estimado").setMinWidth(150);
+			
+			
 			rs.close();
 			stmt.close();
 		} catch (SQLException ex) {
@@ -316,81 +319,76 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	}
 
 	private boolean verificarDatos() {
-		boolean valido=true;
-		String mensajeError= null;
-		if(this.txtFechaIda.getText().isEmpty()) {
-			mensajeError=" Debe ingresar un valor para el campo 'Fecha Ida' ";
-			valido= false;
-		}
-		else {
-			if(! Fechas.validar(this.txtFechaIda.getText().trim())) {
+		boolean valido = true;
+		String mensajeError = null;
+		if (this.txtFechaIda.getText().isEmpty()) {
+			mensajeError = " Debe ingresar un valor para el campo 'Fecha Ida' ";
+			valido = false;
+		} else {
+			if (!Fechas.validar(this.txtFechaIda.getText().trim())) {
 				mensajeError = "En el campo 'Fecha Ida' debe ingresar un valor con el formato dd/mm/aaaa.";
 				txtFechaIda.setText("");
-				valido= false;
+				valido = false;
 			}
 		}
-		if(valido && rdbtnIdayVuelta.isSelected()) {
-			if(this.txtFechaVuelta.getText().isEmpty()) {
-				mensajeError=" Debe ingresar un valor para el campo 'Fecha Vuelta' ";
-				valido=false;
-			}
-			else {
-				if(! Fechas.validar(this.txtFechaVuelta.getText().trim())) {
+		if (valido && rdbtnIdayVuelta.isSelected()) {
+			if (this.txtFechaVuelta.getText().isEmpty()) {
+				mensajeError = " Debe ingresar un valor para el campo 'Fecha Vuelta' ";
+				valido = false;
+			} else {
+				if (!Fechas.validar(this.txtFechaVuelta.getText().trim())) {
 					mensajeError = "En el campo 'Fecha Vuelta' debe ingresar un valor con el formato dd/mm/aaaa.";
-					txtFechaVuelta.setText("");;
-					valido= false;
-				}
-				else {
-					
-					boolean mayor= fechaMayor(this.txtFechaIda.getText().trim(),this.txtFechaVuelta.getText().trim());
-					if(mayor) {
-						valido=false;
-						mensajeError= "La Fecha de Vuelta debe ser posterior a la Fecha de Ida";
+					txtFechaVuelta.setText("");
+					;
+					valido = false;
+				} else {
+
+					boolean mayor = fechaMayor(this.txtFechaIda.getText().trim(), this.txtFechaVuelta.getText().trim());
+					if (mayor) {
+						valido = false;
+						mensajeError = "La Fecha de Vuelta debe ser posterior a la Fecha de Ida";
 						txtFechaVuelta.setText("");
 						txtFechaIda.setText("");
 					}
 				}
-				
+
 			}
-				
+
 		}
-		
-		if(mensajeError != null) {
-			JOptionPane.showMessageDialog(this,
-                    mensajeError,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+
+		if (mensajeError != null) {
+			JOptionPane.showMessageDialog(this, mensajeError, "Error", JOptionPane.ERROR_MESSAGE);
 		}
-		
+
 		return valido;
 	}
 
 	/**
-	 *  Retorna verdadero si fechaIda es mayor que fechaVuelta
+	 * Retorna verdadero si fechaIda es mayor que fechaVuelta
+	 * 
 	 * @param fechaIda
 	 * @param fechaVuelta
 	 * @return
 	 */
-	private boolean fechaMayor(String fechaIda,String fechaVuelta) {
-		boolean mayor=false;
-		
-		java.sql.Date fVuelta= Fechas.convertirStringADateSQL(fechaVuelta);
-		java.sql.Date fIda= Fechas.convertirStringADateSQL(fechaIda);
-		
+	private boolean fechaMayor(String fechaIda, String fechaVuelta) {
+		boolean mayor = false;
+
+		java.sql.Date fVuelta = Fechas.convertirStringADateSQL(fechaVuelta);
+		java.sql.Date fIda = Fechas.convertirStringADateSQL(fechaIda);
+
 		try {
 			Statement stmt = this.conexionBD.createStatement();
 			String sql = "SELECT DATEDIFF(\"" + fVuelta + "\",\"" + fIda + "\");";
-			
-			ResultSet resultado= stmt.executeQuery(sql);
+
+			ResultSet resultado = stmt.executeQuery(sql);
 			resultado.first();
-			
-			int diferencia= resultado.getInt(1);
-			mayor = diferencia<0;
-			
+
+			int diferencia = resultado.getInt(1);
+			mayor = diferencia < 0;
+
 			resultado.close();
 			stmt.close();
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return mayor;

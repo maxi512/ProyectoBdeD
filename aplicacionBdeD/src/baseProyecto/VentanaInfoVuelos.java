@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,7 +40,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	private JRadioButton rdbtnIdayVuelta;
 	private JFormattedTextField txtFechaIda, txtFechaVuelta;
 	private ButtonGroup group;
-	private DBTable tabla;
+	private DBTable tabla, tablaInfoVuelo;
 	private JList listOrigen, listDestino;
 	protected Connection conexionBD = null;
 	protected int seleccionadoOrigen = -1;
@@ -61,7 +62,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	private void initialize() {
 		frame = new JFrame();
 		
-		setPreferredSize(new Dimension(800,600));
+		setPreferredSize(new Dimension(1100,600));
 		this.setBounds(0,0,800,600);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -148,6 +149,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		// inizializo tabla
 
 		tabla = new DBTable();
+		tablaInfoVuelo = new DBTable();
 
 		tabla.setToolTipText("Doble-click o Espacio para seleccionar el registro.");
 		tabla.addKeyListener(new KeyAdapter() {
@@ -164,9 +166,12 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 		// setea la tabla solo para lectura, no se puede editar su contenido
 		tabla.setEditable(false);
-		tabla.setBounds(45, 278, 714, 261);
+		tablaInfoVuelo.setEditable(false);
+		tabla.setBounds(31, 278, 614, 261);
+		tablaInfoVuelo.setBounds(650, 278, 350, 261);
 
 		panel.add(tabla);
+		panel.add(tablaInfoVuelo);
 		pack();
 
 		JButton btnBuscarVuelos = new JButton("Buscar vuelos");
@@ -195,6 +200,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				if (verificarDatos()) {
 					refrescar();
+					
 				}
 			}
 		});
@@ -253,11 +259,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	}
 
 	private void seleccionarFila() {
-		// this.seleccionado = this.tabla.getSelectedRow();
-		// this.txtNombre.setText(this.tabla.getValueAt(this.tabla.getSelectedRow(),
-		// 0).toString());
-		// this.txtFecha.setText(Fechas.convertirDateAString((java.util.Date)
-		// this.tabla.getValueAt(this.tabla.getSelectedRow(), 1)));
+		refrescarInfoVuelo();
 	}
 
 	private void inicializarCampos() {
@@ -265,6 +267,41 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		this.seleccionadoDestino = -1;
 
 
+	}
+	
+	private void refrescarInfoVuelo() {
+		try {
+			int seleccionado = this.tabla.getSelectedRow();
+			
+			String numero = this.tabla.getValueAt(seleccionado, 1).toString();
+			
+			//Asumimos que no va a existir salidas a la misma hora el mismo dia
+			java.sql.Time hora = (java.sql.Time) this.tabla.getValueAt(seleccionado, 4);
+			
+			java.sql.Date fecha = (Date) this.tabla.getValueAt(seleccionado,0);
+			
+			Statement stmt = this.conexionBD.createStatement();
+			
+			String sql = "SELECT vuelo Vuelo, clase Clase, asientos_disponibles Disponibles, precio Precio "
+					+ "FROM vuelos_disponibles "
+					+ "WHERE vuelo = \""+numero+"\" AND fecha = \""+fecha+"\" AND hora_sale = \""+hora+"\";";
+			
+			ResultSet rs = stmt.executeQuery(sql);
+			
+			tablaInfoVuelo.refresh(rs);
+			
+			
+			tablaInfoVuelo.getColumn(0).setMaxWidth(50);
+			
+			rs.close();
+			stmt.close();
+			
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	private void refrescar() {
@@ -276,7 +313,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			java.sql.Date fechaIda = Fechas.convertirStringADateSQL(this.txtFechaIda.getText().trim());
 			java.sql.Date fechaVuelta = null;
 
-			String sql = "SELECT DISTINCT vuelo as 'Numero Vuelo',ciudad_salida as 'Ciudad Salida',nombre_salida as 'Aeropuerto Salida', hora_sale as 'Hora Salida',"
+			String sql = "SELECT DISTINCT fecha as Fecha, vuelo as 'Numero Vuelo',ciudad_salida as 'Ciudad Salida',nombre_salida as 'Aeropuerto Salida', hora_sale as 'Hora Salida',"
 					+ "ciudad_llegada as 'Ciudad Llegada', nombre_llegada as 'Aeropuerto Llegada', hora_llega as 'Hora Llegada', modelo_avion as 'Modelo de avion', Diferencia as 'Tiempo Estimado' "
 					+ "FROM vuelos_disponibles ";
 
@@ -299,6 +336,8 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			tabla.refresh(rs);
 
 			// setea el formato de visualizacion de las columnas "Hora Salida", "Hora Llegada" y "Tiempo Estimado" a Hora:Minuto
+			
+			tabla.getColumnByDatabaseName("Fecha").setDateFormat("dd/MM/YYYY");
 			tabla.getColumnByDatabaseName("Hora Salida").setDateFormat("HH:mm");
 			
 			tabla.getColumnByDatabaseName("Hora Llegada").setDateFormat("HH:mm");

@@ -70,7 +70,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
 			desktopPane = new JDesktopPane();
 			getContentPane().add(desktopPane, BorderLayout.CENTER);
-			desktopPane.setPreferredSize(new java.awt.Dimension(800, 600));
+			desktopPane.setPreferredSize(new java.awt.Dimension(1100, 600));
 
 			menuBar = new JMenuBar();
 			setJMenuBar(menuBar);

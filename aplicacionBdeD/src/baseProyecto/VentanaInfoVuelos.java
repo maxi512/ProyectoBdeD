@@ -19,14 +19,12 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
 
 import quick.dbtable.DBTable;
 
 import java.text.ParseException;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 import javax.swing.JLabel;
 
 public class VentanaInfoVuelos extends JFrame {
@@ -201,7 +199,9 @@ public class VentanaInfoVuelos extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				refrescar();
+				if(verificarDatos()) {
+					refrescar();
+				}
 			}
 		});
 
@@ -306,4 +306,86 @@ public class VentanaInfoVuelos extends JFrame {
 
 		this.inicializarCampos();
 	}
+
+	private boolean verificarDatos() {
+		boolean valido=true;
+		String mensajeError= null;
+		if(this.txtFechaIda.getText().isEmpty()) {
+			mensajeError=" Debe ingresar un valor para el campo 'Fecha Ida' ";
+			valido= false;
+		}
+		else {
+			if(! Fechas.validar(this.txtFechaIda.getText().trim())) {
+				mensajeError = "En el campo 'Fecha Ida' debe ingresar un valor con el formato dd/mm/aaaa.";
+				txtFechaIda.setText("");
+				valido= false;
+			}
+		}
+		if(valido && rdbtnIdayVuelta.isSelected()) {
+			if(this.txtFechaVuelta.getText().isEmpty()) {
+				mensajeError=" Debe ingresar un valor para el campo 'Fecha Vuelta' ";
+				valido=false;
+			}
+			else {
+				if(! Fechas.validar(this.txtFechaVuelta.getText().trim())) {
+					mensajeError = "En el campo 'Fecha Vuelta' debe ingresar un valor con el formato dd/mm/aaaa.";
+					txtFechaVuelta.setText("");;
+					valido= false;
+				}
+				else {
+					
+					boolean mayor= fechaMayor(this.txtFechaIda.getText().trim(),this.txtFechaVuelta.getText().trim());
+					if(mayor) {
+						valido=false;
+						mensajeError= "La Fecha de Vuelta debe ser posterior a la Fecha de Ida";
+						txtFechaVuelta.setText("");
+						txtFechaIda.setText("");
+					}
+				}
+				
+			}
+				
+		}
+		
+		if(mensajeError != null) {
+			JOptionPane.showMessageDialog(this,
+                    mensajeError,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+		}
+		
+		return valido;
+	}
+
+	/**
+	 *  Retorna verdadero si fechaIda es mayor que fechaVuelta
+	 * @param fechaIda
+	 * @param fechaVuelta
+	 * @return
+	 */
+	private boolean fechaMayor(String fechaIda,String fechaVuelta) {
+		boolean mayor=false;
+		
+		java.sql.Date fVuelta= Fechas.convertirStringADateSQL(fechaVuelta);
+		java.sql.Date fIda= Fechas.convertirStringADateSQL(fechaIda);
+		
+		try {
+			Statement stmt = this.conexionBD.createStatement();
+			String sql = "SELECT DATEDIFF(\"" + fVuelta + "\",\"" + fIda + "\");";
+			
+			ResultSet resultado= stmt.executeQuery(sql);
+			resultado.first();
+			
+			int diferencia= resultado.getInt(1);
+			mayor = diferencia<0;
+			
+			resultado.close();
+			stmt.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return mayor;
+	}
+
 }

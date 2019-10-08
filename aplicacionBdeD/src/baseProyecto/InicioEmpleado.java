@@ -4,8 +4,6 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
@@ -126,23 +124,20 @@ public class InicioEmpleado extends JFrame {
 
 						String sql = "SELECT legajo, password FROM usuarios having legajo = " + legajoNumerico
 								+ " and password = md5('" + pass + "');";
-						String[] columnas = null;
 
-						boolean isResultSet = stmt.execute(sql);
-						ResultSet resultado = null;
+						ResultSet resultado =  stmt.executeQuery(sql);
+						
+						int cantFilas = 0;
+						
+						if (resultado.last())
+							cantFilas = resultado.getRow();
 
-						if (isResultSet) {
-							resultado = stmt.getResultSet();
-							int cantFilas = 0;
-							if (resultado.last())
-								cantFilas = resultado.getRow();
-
-							if (cantFilas == 1) {
-								System.out.println("EMPLEADO ACEPTADO");
-							} else {
-								mostrarUsuarioIncorrecto();
-							}
+						if (cantFilas == 1) {
+							System.out.println("EMPLEADO ACEPTADO");
+						} else {
+							mostrarUsuarioIncorrecto();
 						}
+						
 					} catch (NumberFormatException e) {
 						mostrarLegajoNoNumerico();
 					}

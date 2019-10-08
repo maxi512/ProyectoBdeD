@@ -1,5 +1,6 @@
 package baseProyecto;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +19,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.text.MaskFormatter;
 
@@ -27,7 +29,7 @@ import java.text.ParseException;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-public class VentanaInfoVuelos extends JFrame {
+public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 	/**
 	 * 
@@ -73,20 +75,26 @@ public class VentanaInfoVuelos extends JFrame {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 800, 600);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		setPreferredSize(new Dimension(800,600));
+		this.setBounds(0,0,800,600);
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(0, -27, 800, 600);
+		getContentPane().add(panel);
+		panel.setLayout(null);
 
 		group = new ButtonGroup();
 
 		rdbtnIda = new JRadioButton("Solo Ida");
 		rdbtnIda.setSelected(true);
 		rdbtnIda.setBounds(514, 33, 144, 23);
-		frame.getContentPane().add(rdbtnIda);
+		panel.add(rdbtnIda);
 
 		rdbtnIdayVuelta = new JRadioButton("Ida y vuelta");
 		rdbtnIdayVuelta.setBounds(514, 60, 144, 23);
-		frame.getContentPane().add(rdbtnIdayVuelta);
+		panel.add(rdbtnIdayVuelta);
 
 		group.add(rdbtnIda);
 		group.add(rdbtnIdayVuelta);
@@ -101,8 +109,8 @@ public class VentanaInfoVuelos extends JFrame {
 			txtFechaVuelta.setSize(90, 24);
 			txtFechaVuelta.setEditable(false);
 
-			frame.getContentPane().add(txtFechaIda);
-			frame.getContentPane().add(txtFechaVuelta);
+			panel.add(txtFechaIda);
+			panel.add(txtFechaVuelta);
 
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -145,11 +153,11 @@ public class VentanaInfoVuelos extends JFrame {
 
 		listOrigen = new JList(ciudades);
 		listOrigen.setBounds(31, 79, 157, 149);
-		frame.getContentPane().add(listOrigen);
+		panel.add(listOrigen);
 
 		listDestino = new JList(ciudades);
 		listDestino.setBounds(247, 79, 157, 149);
-		frame.getContentPane().add(listDestino);
+		panel.add(listDestino);
 
 		// inizializo tabla
 
@@ -172,28 +180,28 @@ public class VentanaInfoVuelos extends JFrame {
 		tabla.setEditable(false);
 		tabla.setBounds(45, 278, 714, 261);
 
-		frame.getContentPane().add(tabla);
+		panel.add(tabla);
 		pack();
 
 		JButton btnBuscarVuelos = new JButton("Buscar vuelos");
 		btnBuscarVuelos.setBounds(544, 197, 171, 31);
-		frame.getContentPane().add(btnBuscarVuelos);
+		panel.add(btnBuscarVuelos);
 		
 		JLabel lblFechaIda = new JLabel("Fecha Ida");
 		lblFechaIda.setBounds(474, 95, 66, 15);
-		frame.getContentPane().add(lblFechaIda);
+		panel.add(lblFechaIda);
 		
 		JLabel lblFechaVuelta = new JLabel("Fecha Vuelta");
 		lblFechaVuelta.setBounds(474, 148, 111, 15);
-		frame.getContentPane().add(lblFechaVuelta);
+		panel.add(lblFechaVuelta);
 		
 		JLabel lblCiudadOrigen = new JLabel("Ciudad origen");
 		lblCiudadOrigen.setBounds(31, 37, 132, 15);
-		frame.getContentPane().add(lblCiudadOrigen);
+		panel.add(lblCiudadOrigen);
 		
 		JLabel lblCiudadDestinoi = new JLabel("Ciudad destino");
 		lblCiudadDestinoi.setBounds(247, 37, 132, 15);
-		frame.getContentPane().add(lblCiudadDestinoi);
+		panel.add(lblCiudadDestinoi);
 
 		btnBuscarVuelos.addActionListener(new ActionListener() {
 
@@ -267,7 +275,7 @@ public class VentanaInfoVuelos extends JFrame {
 	}
 
 	private void inicializarCampos() {
-		this.seleccionadoOrigen = -1;
+		this.seleccionadoOrigen = -1;	
 		this.seleccionadoDestino = -1;
 
 		this.txtFechaIda.setText("");

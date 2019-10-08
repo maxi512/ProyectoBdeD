@@ -1,5 +1,6 @@
 package baseProyecto;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -19,48 +20,35 @@ import java.awt.event.ActionEvent;
 import java.awt.Font;
 
 @SuppressWarnings("serial")
-public class InicioEmpleado extends JFrame {
+public class InicioEmpleado extends javax.swing.JInternalFrame {
 
+	private VentanaInfoVuelos ventana;
 	private JFrame frame;
 	private JTextField textField;
 	private JPasswordField passwordField;
 	protected Connection conexionBD = null;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					InicioEmpleado window = new InicioEmpleado();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the application.
 	 */
-	public InicioEmpleado() {
+	public InicioEmpleado(VentanaInfoVuelos ventana) {
 		initialize();
+		this.ventana = ventana;
+
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 800, 600);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		setPreferredSize(new Dimension(800, 600));
+		this.setBounds(0, 0, 800, 600);
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JPanel panel = new JPanel();
 		panel.setBounds(0, -27, 800, 600);
-		frame.getContentPane().add(panel);
+		getContentPane().add(panel);
 		panel.setLayout(null);
 
 		textField = new JTextField();
@@ -125,24 +113,22 @@ public class InicioEmpleado extends JFrame {
 						String sql = "SELECT legajo, password FROM usuarios having legajo = " + legajoNumerico
 								+ " and password = md5('" + pass + "');";
 
-						ResultSet resultado =  stmt.executeQuery(sql);
-						
+						ResultSet resultado = stmt.executeQuery(sql);
+
 						int cantFilas = 0;
-						
+
 						if (resultado.last())
 							cantFilas = resultado.getRow();
 
 						if (cantFilas == 1) {
-							System.out.println("EMPLEADO ACEPTADO");
+							activarConsultasEmpleado();
 						} else {
 							mostrarUsuarioIncorrecto();
 						}
-						
+
 					} catch (NumberFormatException e) {
 						mostrarLegajoNoNumerico();
 					}
-
-					
 
 				} catch (SQLException e) {
 					mostrarMensajeError(e.getMessage());
@@ -152,6 +138,8 @@ public class InicioEmpleado extends JFrame {
 		});
 		btnLogearse.setBounds(308, 335, 134, 35);
 		panel.add(btnLogearse);
+
+		pack();
 
 	}
 
@@ -181,5 +169,10 @@ public class InicioEmpleado extends JFrame {
 				mostrarMensajeError(mensaje);
 			}
 		}
+	}
+
+	private void activarConsultasEmpleado() {
+		this.setVisible(false);
+		this.ventana.setVisible(true);
 	}
 }

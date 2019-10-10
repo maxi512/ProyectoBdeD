@@ -29,6 +29,9 @@ public class InicioAdmin extends javax.swing.JInternalFrame{
 		initGUI();		
 	}
 	
+	/**
+	 * Inicializo GUI
+	 */
 	private void initGUI() {
 		try {
 			setPreferredSize(new Dimension(800,600));
@@ -114,6 +117,9 @@ public class InicioAdmin extends javax.swing.JInternalFrame{
 		
 	}
 	
+	/**
+	 * Activo consultas de Administrador
+	 */
 	private void activarConsultasAdmin() {
 		ventanaConsultas.setVisible(true);
 		this.setVisible(false);

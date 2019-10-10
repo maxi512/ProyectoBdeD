@@ -23,7 +23,6 @@ import java.awt.Font;
 public class InicioEmpleado extends javax.swing.JInternalFrame {
 
 	private VentanaInfoVuelos ventana;
-	private JFrame frame;
 	private JTextField textField;
 	private JPasswordField passwordField;
 	protected Connection conexionBD = null;
@@ -41,7 +40,7 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		setPreferredSize(new Dimension(800, 600));
+		setPreferredSize(new Dimension(1100, 600));
 		this.setBounds(0, 0, 800, 600);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -142,21 +141,34 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 		pack();
 
 	}
-
+	
+	/**
+	 * Muestra mensaje de error relacionado al ingreso incorrecto del usuario
+	 */
 	void mostrarUsuarioIncorrecto() {
 		JOptionPane.showMessageDialog(this, "Se produjo un error al intentar conectarse a la base de datos.\n"
 				+ "Usuario y/o contraseña incorrecto.", "Error", JOptionPane.ERROR_MESSAGE);
 	}
-
+	
+	/**
+	 * Muestra mensaje de error al ingresar un numero de legajo no numerico
+	 */
 	void mostrarLegajoNoNumerico() {
 		JOptionPane.showMessageDialog(this, "Se produjo un error al intentar conectarse a la base de datos.\n"
 				+ "Por favor, ingrese numero de legajo correctamente.", "Error", JOptionPane.ERROR_MESSAGE);
 	}
-
+	
+	/**
+	 * Muestra un mensaje de error previamente creado
+	 * @param msg Mensaje a mostrar
+	 */
 	void mostrarMensajeError(String msg) {
 		JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
 	}
-
+	
+	/**
+	 * Cierra la conexion con el servidor
+	 */
 	void cerrarConexion() {
 		if (conexionBD != null) {
 			try {
@@ -170,7 +182,10 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 			}
 		}
 	}
-
+	
+	/**
+	 * Muestra la ventana de consultas para el empleado
+	 */
 	private void activarConsultasEmpleado() {
 		this.setVisible(false);
 		this.ventana.setVisible(true);

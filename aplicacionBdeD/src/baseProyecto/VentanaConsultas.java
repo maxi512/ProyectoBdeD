@@ -34,13 +34,19 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 	private JPanel pnlTablas;
 	private JList listaTablas, listaAtributos;
 	private JScrollPane scrollTablas, scrollAtributos;
-
+	
+	/**
+	 * Constructor VentanaCOnsultas
+	 */
 	public VentanaConsultas() {
 		super();
 		initGUI();
 
 	}
-
+	
+	/**
+	 * Inicializa GUI
+	 */
 	private void initGUI() {
 		try {
 			setPreferredSize(new Dimension(800, 600));
@@ -157,8 +163,9 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 			String sql = "DESCRIBE " + itemSeleccionado + ";";
 			ResultSet rs = stmt.executeQuery(sql);
 			atributos = obtenerContenidoFilas(rs);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (SQLException e) {
+			String msg = "Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage();
+			mostrarMensajeError(msg);
 		}
 
 		lblTituloAtributos.setText(headerScroll);
@@ -169,15 +176,17 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 	private void btnEjecutarActionPerformed(ActionEvent evt) {
 		this.refrescarTabla();
 	}
-
+	
 	private void thisComponentShown(ComponentEvent evt) {
 		this.conectarBD();
 	}
-
+	
 	private void thisComponentHidden(ComponentEvent evt) {
 		this.desconectarBD();
 	}
-
+	/**
+	 * Se conecta a la base de datos Vuelos.
+	 */
 	private void conectarBD() {
 		if (this.conexionBD == null) {
 			try {
@@ -191,26 +200,28 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 				// se intenta establecer la conexi�n
 				this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
 			} catch (SQLException ex) {
-				JOptionPane.showMessageDialog(this,
-						"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(), "Error",
-						JOptionPane.ERROR_MESSAGE);
+				String msg = "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage();
+				mostrarMensajeError(msg);
 			}
 		}
 	}
-
+	/**
+	 * Desconecta de la base de datos Vuelos
+	 */
 	private void desconectarBD() {
 		if (this.conexionBD != null) {
 			try {
 				this.conexionBD.close();
 				this.conexionBD = null;
 			} catch (SQLException ex) {
-				JOptionPane.showMessageDialog(this,
-						"Se produjo un error al intentar desconectarse a la base de datos.\n" + ex.getMessage(),
-						"Error", JOptionPane.ERROR_MESSAGE);
+				String msg = "Se produjo un error al intentar desconectarse a la base de datos.\n" + ex.getMessage();
+				mostrarMensajeError(msg);
 			}
 		}
 	}
-
+	/**
+	 * Refresca la informacion asociada a la tabla resultante de la consulta.
+	 */
 	private void refrescarTabla() {
 		try {
 			Statement stmt = this.conexionBD.createStatement();
@@ -250,13 +261,17 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 			}
 
 		} catch (SQLException ex) {
-			// en caso de error, se muestra la causa en la consola
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
+					+ "VendorError: " + ex.getErrorCode();
+			mostrarMensajeError(msg);
 		}
 	}
-
+	
+	/**
+	 * Dado un resultset, devuelve el nombre de las columnas
+	 * @param tabla Conjunto de valores
+	 * @return Arreglo de strings con los nombres de las columnas.
+	 */
 	private String[] obtenerNombreColumnas(ResultSet tabla) {
 		String columnas[] = null;
 		try {
@@ -264,12 +279,16 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 			for (int i = 1; i <= tabla.getMetaData().getColumnCount(); i++) {
 				columnas[i - 1] = tabla.getMetaData().getColumnName(i);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (SQLException e) {
+			mostrarMensajeError(e.getMessage());
 		}
 		return columnas;
 	}
-
+	/**
+	 * Dado un resultset, devuelve el contenido de la primera columna
+	 * @param tabla Tabla de resultados
+	 * @return arreglo de String
+	 */
 	private String[] obtenerContenidoFilas(ResultSet tabla) {
 		String nombres[] = null;
 		int cantFilas = 0, i = 0;
@@ -283,10 +302,18 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 				nombres[i] = tabla.getString(1);
 				i++;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (SQLException e) {
+			mostrarMensajeError(e.getMessage());
 		}
 		return nombres;
+	}
+
+	/**
+	 * Muestra un mensaje de error.
+	 * @param msg Mensaje a mostrar
+	 */
+	void mostrarMensajeError(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 }

@@ -20,7 +20,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	private JMenu mnuOperaciones;
 	private JMenuItem mniConsultaAdmin;
 	private JMenuItem mniConsultaEmpleado;
-	private JMenuItem mniAbm;
 	private JSeparator separator;
 	private JMenuItem mniSalir;
 
@@ -33,7 +32,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 			}
 		});
 	}
-
+	
+	/**
+	 * Constructor de clase VentanaPrincipal
+	 */
 	public VentanaPrincipal() {
 		super();
 
@@ -55,7 +57,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 		this.inicioEmpleado.setVisible(false);
 		this.desktopPane.add(this.inicioEmpleado);
 	}
-
+	
+	/**
+	 * Inicializa GUI
+	 */
 	private void initGUI() {
 		try {
 			javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
@@ -101,10 +106,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 			});
 			// SETEAR LISTENER
 
-			mniAbm = new JMenuItem();
-			mnuOperaciones.add(mniAbm);
-			mniAbm.setText("Alta - Baja - Modificacion");
-			// SETEAR LISTENER
 
 			separator = new JSeparator();
 			mnuOperaciones.add(separator);

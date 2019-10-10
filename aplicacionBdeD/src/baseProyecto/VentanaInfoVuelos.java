@@ -48,7 +48,6 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 	private JFrame frame;
 
-
 	/**
 	 * Create the application.
 	 */
@@ -61,17 +60,17 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		
-		setPreferredSize(new Dimension(1100,600));
-		this.setBounds(0,0,800,600);
+
+		setPreferredSize(new Dimension(1100, 600));
+		this.setBounds(0, 0, 800, 600);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		JPanel panel = new JPanel();
 		panel.setBounds(0, -27, 800, 600);
 		getContentPane().add(panel);
 		panel.setLayout(null);
-		
+
 		group = new ButtonGroup();
 
 		rdbtnIda = new JRadioButton("Solo Ida");
@@ -100,7 +99,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			panel.add(txtFechaVuelta);
 
 		} catch (ParseException e) {
-			e.printStackTrace();
+			mostrarMensajeError(e.getMessage());
 		}
 
 		rdbtnIda.addActionListener(new ActionListener() {
@@ -133,7 +132,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			rs = stmt.executeQuery(sql);
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			mostrarMensajeError(e.getMessage());
 		}
 
 		String ciudades[] = obtenerContenidoFilas(rs);
@@ -150,6 +149,8 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 		tabla = new DBTable();
 		tablaInfoVuelo = new DBTable();
+		tabla.setVisible(false);
+		tablaInfoVuelo.setVisible(false);
 
 		tabla.setToolTipText("Doble-click o Espacio para seleccionar el registro.");
 		tabla.addKeyListener(new KeyAdapter() {
@@ -200,13 +201,17 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				if (verificarDatos()) {
 					refrescar();
-					
+					tabla.setVisible(true);
+					tablaInfoVuelo.setVisible(false);
+
 				}
 			}
 		});
 
 	}
-
+	/**
+	 * Realiza la coneccion con la base de datos Vuelos
+	 */
 	private void conectarBD() {
 		if (this.conexionBD == null) {
 			try {
@@ -220,13 +225,19 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 				// se intenta establecer la conexi�n
 				this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
 			} catch (SQLException ex) {
-				JOptionPane.showMessageDialog(this,
-						"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(), "Error",
-						JOptionPane.ERROR_MESSAGE);
+				String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
+						+ "VendorError: " + ex.getErrorCode();
+				
+				mostrarMensajeError(msg);
 			}
 		}
 	}
-
+	
+	/**
+	 * Dado un resultSet, devuelve 
+	 * @param tabla
+	 * @return
+	 */
 	private String[] obtenerContenidoFilas(ResultSet tabla) {
 		String nombres[] = null;
 		int cantFilas = 0, i = 0;
@@ -257,53 +268,65 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			this.seleccionarFila();
 		}
 	}
-
+	
+	/*
+	 * Accion a realizar cuando se selecciona una fila (Refresca Tabla)
+	 */
 	private void seleccionarFila() {
 		refrescarInfoVuelo();
+		tablaInfoVuelo.setVisible(true);
 	}
-
+	
+	/**
+	 * inicializo los index de las listas
+	 */
 	private void inicializarCampos() {
 		this.seleccionadoOrigen = -1;
 		this.seleccionadoDestino = -1;
 
-
 	}
 	
+	/**
+	 * Refresca los datos de la tabla de clases
+	 */
 	private void refrescarInfoVuelo() {
 		try {
 			int seleccionado = this.tabla.getSelectedRow();
-			
+
 			String numero = this.tabla.getValueAt(seleccionado, 1).toString();
-			
-			//Asumimos que no va a existir salidas a la misma hora el mismo dia
+
+			// Asumimos que no van a existir salidas a la misma hora el mismo dia en simultaneo
 			java.sql.Time hora = (java.sql.Time) this.tabla.getValueAt(seleccionado, 4);
-			
-			java.sql.Date fecha = (Date) this.tabla.getValueAt(seleccionado,0);
-			
+
+			java.sql.Date fecha = (Date) this.tabla.getValueAt(seleccionado, 0);
+
 			Statement stmt = this.conexionBD.createStatement();
-			
+
 			String sql = "SELECT vuelo Vuelo, clase Clase, asientos_disponibles Disponibles, precio Precio "
-					+ "FROM vuelos_disponibles "
-					+ "WHERE vuelo = \""+numero+"\" AND fecha = \""+fecha+"\" AND hora_sale = \""+hora+"\";";
-			
+					+ "FROM vuelos_disponibles " + "WHERE vuelo = \"" + numero + "\" AND fecha = \"" + fecha
+					+ "\" AND hora_sale = \"" + hora + "\";";
+
 			ResultSet rs = stmt.executeQuery(sql);
-			
+
 			tablaInfoVuelo.refresh(rs);
-			
-			
+
 			tablaInfoVuelo.getColumn(0).setMaxWidth(50);
-			
+
 			rs.close();
 			stmt.close();
-			
-			
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-	}
 
+		} catch (SQLException ex) {
+			String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
+					+ "VendorError: " + ex.getErrorCode();
+			
+			mostrarMensajeError(msg);
+		}
+
+	}
+	
+	/*
+	 * Refresca los datos de la tabla de vuelos
+	 */
 	private void refrescar() {
 		try {
 			Statement stmt = this.conexionBD.createStatement();
@@ -321,8 +344,9 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 			if (rdbtnIdayVuelta.isSelected()) {
 				fechaVuelta = Fechas.convertirStringADateSQL(this.txtFechaVuelta.getText().trim());
-				wheresql = "WHERE (ciudad_salida = \"" + ciudadOrigen + "\" AND ciudad_llegada = \"" + ciudadDestino + "\" AND " + "fecha = \"" + fechaIda + "\") OR "
-						+ "(ciudad_salida = \"" + ciudadDestino + "\" AND ciudad_llegada = \"" + ciudadOrigen + "\" AND " + "fecha = \"" + fechaVuelta + "\");";
+				wheresql = "WHERE (ciudad_salida = \"" + ciudadOrigen + "\" AND ciudad_llegada = \"" + ciudadDestino
+						+ "\" AND " + "fecha = \"" + fechaIda + "\") OR " + "(ciudad_salida = \"" + ciudadDestino
+						+ "\" AND ciudad_llegada = \"" + ciudadOrigen + "\" AND " + "fecha = \"" + fechaVuelta + "\");";
 			} else {
 				wheresql = "WHERE ciudad_salida = \"" + ciudadOrigen + "\" AND ciudad_llegada = \"" + ciudadDestino
 						+ "\" AND fecha = \"" + fechaIda + "\";";
@@ -335,28 +359,35 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			// actualiza el contenido de la tabla con los datos del resulset rs
 			tabla.refresh(rs);
 
-			// setea el formato de visualizacion de las columnas "Hora Salida", "Hora Llegada" y "Tiempo Estimado" a Hora:Minuto
-			
+			// setea el formato de visualizacion de las columnas "Hora Salida", "Hora
+			// Llegada" y "Tiempo Estimado" a Hora:Minuto
+
 			tabla.getColumnByDatabaseName("Fecha").setDateFormat("dd/MM/YYYY");
 			tabla.getColumnByDatabaseName("Hora Salida").setDateFormat("HH:mm");
-			
+
 			tabla.getColumnByDatabaseName("Hora Llegada").setDateFormat("HH:mm");
-			
+
 			tabla.getColumnByDatabaseName("Tiempo Estimado").setDateFormat("HH:mm");
 			tabla.getColumnByDatabaseName("Tiempo Estimado").setMinWidth(150);
-			
-			
+
 			rs.close();
 			stmt.close();
 		} catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+
+			String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
+					+ "VendorError: " + ex.getErrorCode();
+			
+			mostrarMensajeError(msg);
+
 		}
 
 		this.inicializarCampos();
 	}
-
+	
+	/**
+	 * Realiza validaciones sobre los datos ingresados por el usuario
+	 * @return True si los datos son correctos, falso en caso contrario
+	 */
 	private boolean verificarDatos() {
 		boolean valido = true;
 		String mensajeError = null;
@@ -396,7 +427,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		}
 
 		if (mensajeError != null) {
-			JOptionPane.showMessageDialog(this, mensajeError, "Error", JOptionPane.ERROR_MESSAGE);
+			mostrarMensajeError(mensajeError);
 		}
 
 		return valido;
@@ -405,9 +436,9 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	/**
 	 * Retorna verdadero si fechaIda es mayor que fechaVuelta
 	 * 
-	 * @param fechaIda
-	 * @param fechaVuelta
-	 * @return
+	 * @param fechaIda Fecha de ida a verificar
+	 * @param fechaVuelta Fecha de Vuelta a verificar
+	 * @return True si fechaIda es mayor que fechaVuelta, Falso en caso contrario
 	 */
 	private boolean fechaMayor(String fechaIda, String fechaVuelta) {
 		boolean mayor = false;
@@ -427,10 +458,21 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 			resultado.close();
 			stmt.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (SQLException ex) {
+			String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
+					+ "VendorError: " + ex.getErrorCode();
+			
+			mostrarMensajeError(msg);
 		}
 		return mayor;
+	}
+	
+	/**
+	 * Muestra un mensaje de error
+	 * @param msg Mensaje a mostrar
+	 */
+	void mostrarMensajeError(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 }

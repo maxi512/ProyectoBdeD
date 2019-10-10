@@ -76,11 +76,11 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 		rdbtnIda = new JRadioButton("Solo Ida");
 		rdbtnIda.setSelected(true);
-		rdbtnIda.setBounds(514, 33, 144, 23);
+		rdbtnIda.setBounds(804, 91, 144, 23);
 		panel.add(rdbtnIda);
 
 		rdbtnIdayVuelta = new JRadioButton("Ida y vuelta");
-		rdbtnIdayVuelta.setBounds(514, 60, 144, 23);
+		rdbtnIdayVuelta.setBounds(804, 137, 144, 23);
 		panel.add(rdbtnIdayVuelta);
 
 		group.add(rdbtnIda);
@@ -168,18 +168,18 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		tabla.setEditable(false);
 		tablaInfoVuelo.setEditable(false);
 		tabla.setBounds(31, 278, 614, 261);
-		tablaInfoVuelo.setBounds(650, 278, 350, 261);
+		tablaInfoVuelo.setBounds(670, 278, 390, 261);
 
 		panel.add(tabla);
 		panel.add(tablaInfoVuelo);
 		pack();
 
 		JButton btnBuscarVuelos = new JButton("Buscar vuelos");
-		btnBuscarVuelos.setBounds(544, 197, 171, 31);
+		btnBuscarVuelos.setBounds(744, 197, 171, 31);
 		panel.add(btnBuscarVuelos);
 
 		JLabel lblFechaIda = new JLabel("Fecha Ida");
-		lblFechaIda.setBounds(474, 95, 66, 15);
+		lblFechaIda.setBounds(474, 95, 80, 15);
 		panel.add(lblFechaIda);
 
 		JLabel lblFechaVuelta = new JLabel("Fecha Vuelta");

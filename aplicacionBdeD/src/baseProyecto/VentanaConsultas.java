@@ -184,6 +184,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 	private void thisComponentHidden(ComponentEvent evt) {
 		this.desconectarBD();
 	}
+	
 	/**
 	 * Se conecta a la base de datos Vuelos.
 	 */
@@ -205,6 +206,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 			}
 		}
 	}
+	
 	/**
 	 * Desconecta de la base de datos Vuelos
 	 */
@@ -219,6 +221,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 			}
 		}
 	}
+	
 	/**
 	 * Refresca la informacion asociada a la tabla resultante de la consulta.
 	 */
@@ -284,6 +287,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 		}
 		return columnas;
 	}
+	
 	/**
 	 * Dado un resultset, devuelve el contenido de la primera columna
 	 * @param tabla Tabla de resultados

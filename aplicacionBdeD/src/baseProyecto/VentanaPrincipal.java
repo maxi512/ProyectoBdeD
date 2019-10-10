@@ -100,7 +100,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					mnConsultaEmpleadoActionPerformed(arg0);
+					mniConsultaEmpleadoActionPerformed(arg0);
 					
 				}
 			});
@@ -126,12 +126,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 		}
 	}
 
-	private void mnConsultaEmpleadoActionPerformed(ActionEvent arg0) {
-		try {
-			this.ventanaConsultas.setMaximum(true);
-		} catch (PropertyVetoException e) {
-		}
-		
+	private void mniConsultaEmpleadoActionPerformed(ActionEvent arg0) {
+		this.ventanaInfoVuelos.setVisible(false);
 		this.inicioEmpleado.setVisible(true);
 	}
 
@@ -140,6 +136,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 			this.ventanaConsultas.setMaximum(true);
 		} catch (PropertyVetoException e) {
 		}
+		this.ventanaConsultas.setVisible(false);
 		this.inicioSesion.setVisible(true);
 	}
 

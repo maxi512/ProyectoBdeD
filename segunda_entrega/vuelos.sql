@@ -233,12 +233,6 @@ CREATE TABLE reserva_vuelo_clase(
 
 )Engine = InnoDB;
 
-create table usuarios(
-	legajo INT UNSIGNED not null,
-	password CHAR(32),
-	primary key (legajo)
-	)Engine = InnoDB;
-
 
 # CREACION DE LA VISTA
 CREATE VIEW vuelos_disponibles AS
@@ -275,7 +269,7 @@ FROM    (SELECT sal.vuelo,ins.fecha,ins.dia,sal.modelo_avion,sal.hora_sale,sal.h
 			
 WHERE	info_vuelo.vuelo=info_aeropuerto.vuelo AND info_aeropuerto.vuelo=info_disponibles.vuelo AND
 		info_vuelo.fecha=info_aeropuerto.fecha AND info_aeropuerto.fecha=info_disponibles.fecha AND
-		info_vuelo.dia=info_aeropuerto.dia AND info_aeropuerto.dia=info_disponibles.dia;
+		info_vuelo.dia=info_aeropuerto.dia AND info_aeropuerto.dia=info_disponibles.dia AND (info_vuelo.fecha > CURDATE());
  
 
 

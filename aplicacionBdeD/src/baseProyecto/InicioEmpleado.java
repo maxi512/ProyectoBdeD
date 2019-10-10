@@ -1,12 +1,11 @@
 package baseProyecto;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.JPasswordField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -43,8 +42,9 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 		setPreferredSize(new Dimension(1100, 600));
 		this.setBounds(0, 0, 800, 600);
 		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+		this.setClosable(true);
+		this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+		
 		JPanel panel = new JPanel();
 		panel.setBounds(0, -27, 800, 600);
 		getContentPane().add(panel);
@@ -86,14 +86,14 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 
 				try {
 
-					// se genera el string que define los datos de la conexiï¿½n
+					// se genera el string que define los datos de la conexion
 					String servidor = "localhost:3306";
 					String baseDatos = "vuelos";
 					String usuario = "admin";
 					String clave = "admin";
 					String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos
 							+ "?serverTimezone=America/Argentina/Buenos_Aires";
-					// se intenta establecer la conexiï¿½n
+					// se intenta establecer la conexion
 					conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
 
 				} catch (SQLException ex) {
@@ -109,7 +109,7 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 					try {
 						int legajoNumerico = Integer.parseInt(legajo);
 
-						String sql = "SELECT legajo, password FROM usuarios having legajo = " + legajoNumerico
+						String sql = "SELECT legajo, password FROM empleados where legajo = " + legajoNumerico
 								+ " and password = md5('" + pass + "');";
 
 						ResultSet resultado = stmt.executeQuery(sql);
@@ -147,7 +147,7 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 	 */
 	void mostrarUsuarioIncorrecto() {
 		JOptionPane.showMessageDialog(this, "Se produjo un error al intentar conectarse a la base de datos.\n"
-				+ "Usuario y/o contraseÃ±a incorrecto.", "Error", JOptionPane.ERROR_MESSAGE);
+				+ "Usuario y/o contraseña incorrecto.", "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	/**
@@ -188,6 +188,8 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 	 */
 	private void activarConsultasEmpleado() {
 		this.setVisible(false);
+		this.passwordField.setText("");
+		this.textField.setText("");
 		this.ventana.setVisible(true);
 	}
 }

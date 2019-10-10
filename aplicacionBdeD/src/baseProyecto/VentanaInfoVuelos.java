@@ -22,6 +22,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.WindowConstants;
 import javax.swing.text.MaskFormatter;
 
 import quick.dbtable.DBTable;
@@ -46,7 +47,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	protected int seleccionadoOrigen = -1;
 	protected int seleccionadoDestino = -1;
 
-	private JFrame frame;
+	
 
 	/**
 	 * Create the application.
@@ -59,13 +60,14 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
+		
 
 		setPreferredSize(new Dimension(1100, 600));
 		this.setBounds(0, 0, 800, 600);
 		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+		this.setClosable(true);
+		this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+		
 		JPanel panel = new JPanel();
 		panel.setBounds(0, -27, 800, 600);
 		getContentPane().add(panel);
@@ -209,6 +211,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		});
 
 	}
+	
 	/**
 	 * Realiza la coneccion con la base de datos Vuelos
 	 */
@@ -269,7 +272,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		}
 	}
 	
-	/*
+	/**
 	 * Accion a realizar cuando se selecciona una fila (Refresca Tabla)
 	 */
 	private void seleccionarFila() {
@@ -311,6 +314,10 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			tablaInfoVuelo.refresh(rs);
 
 			tablaInfoVuelo.getColumn(0).setMaxWidth(50);
+			
+			tablaInfoVuelo.getColumn(3).setMinWidth(90);
+			
+			tablaInfoVuelo.getColumn(1).setMaxWidth(120);
 
 			rs.close();
 			stmt.close();
@@ -324,7 +331,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 	}
 	
-	/*
+	/**
 	 * Refresca los datos de la tabla de vuelos
 	 */
 	private void refrescar() {
@@ -361,15 +368,18 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 			// setea el formato de visualizacion de las columnas "Hora Salida", "Hora
 			// Llegada" y "Tiempo Estimado" a Hora:Minuto
-
-			tabla.getColumnByDatabaseName("Fecha").setDateFormat("dd/MM/YYYY");
 			tabla.getColumnByDatabaseName("Hora Salida").setDateFormat("HH:mm");
 
 			tabla.getColumnByDatabaseName("Hora Llegada").setDateFormat("HH:mm");
 
 			tabla.getColumnByDatabaseName("Tiempo Estimado").setDateFormat("HH:mm");
 			tabla.getColumnByDatabaseName("Tiempo Estimado").setMinWidth(150);
-
+			
+			tabla.getColumnByDatabaseName("Fecha").setDateFormat("dd/MM/YYYY");
+			tabla.getColumnByDatabaseName("Fecha").setMinWidth(80);
+			
+			
+			
 			rs.close();
 			stmt.close();
 		} catch (SQLException ex) {

@@ -128,6 +128,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
 	private void mniConsultaEmpleadoActionPerformed(ActionEvent arg0) {
 		this.ventanaInfoVuelos.setVisible(false);
+		this.inicioSesion.setVisible(true);
+		this.ventanaConsultas.setVisible(false);
 		this.inicioEmpleado.setVisible(true);
 	}
 
@@ -137,6 +139,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 		} catch (PropertyVetoException e) {
 		}
 		this.ventanaConsultas.setVisible(false);
+		this.ventanaInfoVuelos.setVisible(false);
+		this.inicioEmpleado.setVisible(false);
 		this.inicioSesion.setVisible(true);
 	}
 

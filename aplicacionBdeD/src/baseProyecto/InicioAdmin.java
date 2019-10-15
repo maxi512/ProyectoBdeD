@@ -34,7 +34,7 @@ public class InicioAdmin extends javax.swing.JInternalFrame{
 	 */
 	private void initGUI() {
 		try {
-			setPreferredSize(new Dimension(800,600));
+			setPreferredSize(new Dimension(1100,600));
 			this.setBounds(0,0,800,600);
 			setVisible(true);
 			BorderLayout thisLayout = new BorderLayout();

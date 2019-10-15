@@ -51,28 +51,28 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 		panel.setLayout(null);
 
 		textField = new JTextField();
-		textField.setFont(new Font("Dialog", Font.PLAIN, 14));
-		textField.setBounds(473, 128, 124, 19);
+		textField.setFont(new Font("Dialog", Font.PLAIN, 13));
+		textField.setBounds(281, 61, 124, 19);
 		panel.add(textField);
 		textField.setColumns(10);
 
 		passwordField = new JPasswordField();
-		passwordField.setFont(new Font("Dialog", Font.PLAIN, 14));
-		passwordField.setBounds(473, 224, 124, 19);
+		passwordField.setFont(new Font("Dialog", Font.PLAIN, 13));
+		passwordField.setBounds(281, 121, 124, 19);
 		panel.add(passwordField);
 
 		JLabel lblUser = new JLabel("Nro de legajo:");
-		lblUser.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblUser.setBounds(193, 130, 124, 15);
+		lblUser.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblUser.setBounds(92, 63, 150, 15);
 		panel.add(lblUser);
 
 		JLabel lblPassword = new JLabel("Password");
-		lblPassword.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblPassword.setBounds(193, 226, 101, 15);
+		lblPassword.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblPassword.setBounds(92, 123, 83, 15);
 		panel.add(lblPassword);
 
 		JButton btnLogearse = new JButton("Logearse");
-		btnLogearse.setFont(new Font("Dialog", Font.BOLD, 14));
+		btnLogearse.setFont(new Font("Dialog", Font.BOLD, 13));
 		btnLogearse.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
@@ -135,7 +135,7 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 
 			}
 		});
-		btnLogearse.setBounds(308, 335, 134, 35);
+		btnLogearse.setBounds(167, 178, 150, 30);
 		panel.add(btnLogearse);
 
 		pack();
@@ -147,7 +147,7 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 	 */
 	void mostrarUsuarioIncorrecto() {
 		JOptionPane.showMessageDialog(this, "Se produjo un error al intentar conectarse a la base de datos.\n"
-				+ "Usuario y/o contraseña incorrecto.", "Error", JOptionPane.ERROR_MESSAGE);
+				+ "Usuario y/o contraseï¿½a incorrecto.", "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	/**

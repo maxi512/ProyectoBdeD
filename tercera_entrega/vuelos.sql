@@ -316,6 +316,9 @@ GRANT SELECT, INSERT, UPDATE ON vuelos.reserva_vuelo_clase TO 'empleado'@'%';
 
 #CREACION DE STORE PROCEDURE
 delimiter !
+
+#PROCEDURE PARA RESERVAR VIAJE DE IDA
+#
 CREATE PROCEDURE reservarVueloIda(IN numero VARCHAR(50), IN fecha DATE, IN clase VARCHAR(50), IN tipo_doc VARCHAR(50), IN nro_doc INT, IN legajoEmpleado INT)
 BEGIN
 	DECLARE estado_reserva VARCHAR(50);
@@ -353,32 +356,8 @@ BEGIN
 END;!
 
 
-
-# Este TRIGGER se encarga de crear las filas correspondientes en la tabla asientos_reservados, asociadas a
-# cada clase que brinda cada vuelo. Cuando se crea una fila en la clase brinda, se agrega la fila correspondiente
-# a la tabla asientos_reservados, con cantidad=0
-
-CREATE TRIGGER asientos_reservados_update
-AFTER INSERT ON brinda
-FOR EACH ROW 
-BEGIN
-	DECLARE fecha_vuelo DATE;
-	DECLARE fin BOOLEAN DEFAULT false;
-	#Declaro cursor para la consulta que devuelve las fechas de un vuelo en un dia determinado.
-	DECLARE C CURSOR FOR SELECT fecha FROM instancias_vuelo iv WHERE NEW.vuelo= iv.vuelo AND NEW.dia=iv.dia GROUP BY fecha;
-	#Declaro la operacion a realizar cuando el fetch no encuentre mas filas
-	DECLARE CONTINUE HANDLER FOR NOT FOUND SET fin=true; 
-	OPEN C;
-	FETCH C INTO fecha_vuelo; #Recupero la primera fila del cursor
- 	WHILE NOT fin DO
-		#Inserto en la tabla asientos_reservados una fila con el vuelo, la fecha, la clase, y la cantidad de asientos reservados.
-		INSERT INTO asientos_reservados VALUES (NEW.vuelo,fecha_vuelo,NEW.clase,0);
-		FETCH C INTO fecha_vuelo; #Recupero la proxima fila
-	END WHILE;
-	CLOSE C;
-END; !
-
-
+#PROCEDURE PARA RESERVAR VIAJE DE IDA Y VUELTA
+#
 CREATE PROCEDURE reservarVueloIdaVuelta(IN numeroIda VARCHAR(50),IN numeroVuelta VARCHAR(50), IN fechaIda DATE,IN fechaVuelta DATE, IN claseIda VARCHAR(50),IN claseVuelta VARCHAR(50), IN tipo_doc VARCHAR(50), IN nro_doc INT, IN legajoEmpleado INT)
 BEGIN
 	DECLARE estado_reserva VARCHAR(50);
@@ -439,6 +418,78 @@ BEGIN
 	COMMIT;
 END;!
 
+
+#PUNTO 4 PROYECTO
+# CARGA EN LA BASE DE DATOS LAS INSTANCIAS DE VUELO CORRESPONDIENTES A PARTIR DE LA FECHA ACTUAL
+# HASTA EL 31 de DICIEMBRE.
+#
+CREATE TRIGGER actualizar_instancias_vuelo
+AFTER INSERT ON salidas
+FOR EACH ROW
+BEGIN 
+	DECLARE fecha_instancia DATE;
+	DECLARE fecha_corte DATE;
+	
+	IF (DAYOFWEEK(CURDATE())> obtener_nro_dia(NEW.dia))
+	THEN
+		SELECT DATE_ADD(CURDATE(), INTERVAL ((7 - DAYOFWEEK(CURDATE()))+ obtener_nro_dia(NEW.dia)) DAY ) INTO fecha_instancia;
+	ELSE
+		SELECT DATE_ADD(CURDATE(), INTERVAL (obtener_nro_dia(NEW.dia) - DAYOFWEEK(CURDATE())) DAY ) INTO fecha_instancia;
+	END IF;
+	
+	SELECT CONCAT(YEAR(CURDATE()),'-12-31') INTO fecha_corte;
+	
+	WHILE (fecha_instancia <= fecha_corte) DO
+		INSERT INTO instancias_vuelo VALUES (NEW.vuelo,fecha_instancia,NEW.dia,'a tiempo');
+		SELECT DATE_ADD(fecha_instancia, INTERVAL 7 DAY) INTO fecha_instancia;
+	END WHILE;
+END; !
+
+
+# FUNCION PARA RETORNAR EL NUMERO DEL DIA PASADO COMO PARAMETRO 
+#
+CREATE FUNCTION obtener_nro_dia(dia VARCHAR(2)) RETURNS TINYINT
+DETERMINISTIC
+BEGIN
+	CASE dia
+		WHEN 'Do' THEN RETURN 1;
+		WHEN 'Lu' THEN RETURN 2;
+		WHEN 'Ma' THEN RETURN 3;
+		WHEN 'Mi' THEN RETURN 4;
+		WHEN 'Ju' THEN RETURN 5;
+		WHEN 'Vi' THEN RETURN 6;
+		WHEN 'Sa' THEN RETURN 7;
+	END CASE; 	
+ END; !
+
+ 
+# Este TRIGGER se encarga de crear las filas correspondientes en la tabla asientos_reservados, asociadas a
+# cada clase que brinda cada vuelo. Cuando se crea una fila en la clase brinda, se agrega la fila correspondiente
+# a la tabla asientos_reservados, con cantidad=0
+#
+CREATE TRIGGER asientos_reservados_update
+AFTER INSERT ON brinda
+FOR EACH ROW 
+BEGIN
+	DECLARE fecha_vuelo DATE;
+	DECLARE fin BOOLEAN DEFAULT false;
+	#Declaro cursor para la consulta que devuelve las fechas de un vuelo en un dia determinado.
+	DECLARE C CURSOR FOR SELECT fecha FROM instancias_vuelo iv WHERE NEW.vuelo= iv.vuelo AND NEW.dia=iv.dia GROUP BY fecha;
+	#Declaro la operacion a realizar cuando el fetch no encuentre mas filas
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET fin=true; 
+	OPEN C;
+	FETCH C INTO fecha_vuelo; #Recupero la primera fila del cursor
+ 	WHILE NOT fin DO
+		#Inserto en la tabla asientos_reservados una fila con el vuelo, la fecha, la clase, y la cantidad de asientos reservados.
+		INSERT INTO asientos_reservados VALUES (NEW.vuelo,fecha_vuelo,NEW.clase,0);
+		FETCH C INTO fecha_vuelo; #Recupero la proxima fila
+	END WHILE;
+	CLOSE C;
+	
+END;!
+
+
+ 
 delimiter ;
 
 

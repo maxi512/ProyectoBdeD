@@ -18,7 +18,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	private JMenuBar menuBar;
 
 	private JMenu mnuOperaciones;
-	private JMenuItem mniConsultaAdmin;
+	private JMenuItem mniConsultaAdmin, mniReserva;
 	private JMenuItem mniConsultaEmpleado;
 	private JSeparator separator;
 	private JMenuItem mniSalir;
@@ -83,6 +83,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 			mnuOperaciones = new JMenu();
 			menuBar.add(mnuOperaciones);
 			mnuOperaciones.setText("Operaciones");
+			
 
 			mniConsultaAdmin = new JMenuItem();
 			mnuOperaciones.add(mniConsultaAdmin);
@@ -106,7 +107,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 			});
 			// SETEAR LISTENER
 
-
+			mniReserva = new JMenuItem();
+			mnuOperaciones.add(mniReserva);
+			mniReserva.setText("Realizar Reserva");
+			
 			separator = new JSeparator();
 			mnuOperaciones.add(separator);
 

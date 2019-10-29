@@ -22,6 +22,8 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 import javax.swing.text.MaskFormatter;
 
@@ -44,10 +46,10 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	private DBTable tabla, tablaInfoVuelo;
 	private JList listOrigen, listDestino;
 	protected Connection conexionBD = null;
+	private int legajoEmpleado;
+	private String passEmpleado;
 	protected int seleccionadoOrigen = -1;
 	protected int seleccionadoDestino = -1;
-
-	
 
 	/**
 	 * Create the application.
@@ -60,14 +62,13 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		
 
 		setPreferredSize(new Dimension(1100, 600));
 		this.setBounds(0, 0, 800, 600);
 		setVisible(true);
 		this.setClosable(true);
 		this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-		
+
 		JPanel panel = new JPanel();
 		panel.setBounds(0, -27, 800, 600);
 		getContentPane().add(panel);
@@ -181,6 +182,18 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		btnBuscarVuelos.setBounds(744, 197, 171, 31);
 		panel.add(btnBuscarVuelos);
 
+		JButton btnReserva = new JButton("Realizar Reserva");
+		btnReserva.setBounds(945, 91, 70, 70);
+
+		btnReserva.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				accionBotonReserva();
+			}
+		});
+		panel.add(btnReserva);
+
 		JLabel lblFechaIda = new JLabel("Fecha Ida");
 		lblFechaIda.setBounds(474, 95, 80, 15);
 		panel.add(lblFechaIda);
@@ -211,7 +224,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		});
 
 	}
-	
+
 	/**
 	 * Realiza la coneccion con la base de datos Vuelos
 	 */
@@ -230,14 +243,15 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			} catch (SQLException ex) {
 				String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
 						+ "VendorError: " + ex.getErrorCode();
-				
+
 				mostrarMensajeError(msg);
 			}
 		}
 	}
-	
+
 	/**
-	 * Dado un resultSet, devuelve 
+	 * Dado un resultSet, devuelve
+	 * 
 	 * @param tabla
 	 * @return
 	 */
@@ -271,7 +285,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			this.seleccionarFila();
 		}
 	}
-	
+
 	/**
 	 * Accion a realizar cuando se selecciona una fila (Refresca Tabla)
 	 */
@@ -279,7 +293,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		refrescarInfoVuelo();
 		tablaInfoVuelo.setVisible(true);
 	}
-	
+
 	/**
 	 * inicializo los index de las listas
 	 */
@@ -288,7 +302,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		this.seleccionadoDestino = -1;
 
 	}
-	
+
 	/**
 	 * Refresca los datos de la tabla de clases
 	 */
@@ -298,7 +312,8 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 			String numero = this.tabla.getValueAt(seleccionado, 1).toString();
 
-			// Asumimos que no van a existir salidas a la misma hora el mismo dia en simultaneo
+			// Asumimos que no van a existir salidas a la misma hora el mismo dia en
+			// simultaneo
 			java.sql.Time hora = (java.sql.Time) this.tabla.getValueAt(seleccionado, 4);
 
 			java.sql.Date fecha = (Date) this.tabla.getValueAt(seleccionado, 0);
@@ -314,9 +329,9 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			tablaInfoVuelo.refresh(rs);
 
 			tablaInfoVuelo.getColumn(0).setMaxWidth(50);
-			
+
 			tablaInfoVuelo.getColumn(3).setMinWidth(90);
-			
+
 			tablaInfoVuelo.getColumn(1).setMaxWidth(120);
 
 			rs.close();
@@ -325,12 +340,12 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		} catch (SQLException ex) {
 			String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
 					+ "VendorError: " + ex.getErrorCode();
-			
+
 			mostrarMensajeError(msg);
 		}
 
 	}
-	
+
 	/**
 	 * Refresca los datos de la tabla de vuelos
 	 */
@@ -374,28 +389,27 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 			tabla.getColumnByDatabaseName("Tiempo Estimado").setDateFormat("HH:mm");
 			tabla.getColumnByDatabaseName("Tiempo Estimado").setMinWidth(150);
-			
+
 			tabla.getColumnByDatabaseName("Fecha").setDateFormat("dd/MM/YYYY");
 			tabla.getColumnByDatabaseName("Fecha").setMinWidth(80);
-			
-			
-			
+
 			rs.close();
 			stmt.close();
 		} catch (SQLException ex) {
 
 			String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
 					+ "VendorError: " + ex.getErrorCode();
-			
+
 			mostrarMensajeError(msg);
 
 		}
 
 		this.inicializarCampos();
 	}
-	
+
 	/**
 	 * Realiza validaciones sobre los datos ingresados por el usuario
+	 * 
 	 * @return True si los datos son correctos, falso en caso contrario
 	 */
 	private boolean verificarDatos() {
@@ -446,7 +460,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	/**
 	 * Retorna verdadero si fechaIda es mayor que fechaVuelta
 	 * 
-	 * @param fechaIda Fecha de ida a verificar
+	 * @param fechaIda    Fecha de ida a verificar
 	 * @param fechaVuelta Fecha de Vuelta a verificar
 	 * @return True si fechaIda es mayor que fechaVuelta, Falso en caso contrario
 	 */
@@ -471,18 +485,49 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		} catch (SQLException ex) {
 			String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
 					+ "VendorError: " + ex.getErrorCode();
-			
+
 			mostrarMensajeError(msg);
 		}
 		return mayor;
 	}
 	
+	private void accionBotonReserva() {
+		/**
+		 * obtener datos ingresar datos
+		 */
+
+		// SOLO IDA
+		if (rdbtnIda.isSelected()) {
+			int vueloSeleccionado = this.tabla.getSelectedRow();
+			int claseSeleccionada = this.tablaInfoVuelo.getSelectedRow();
+			
+			java.sql.Date fechaIda = Fechas.convertirStringADateSQL(this.txtFechaIda.getText().trim());
+
+			String numero = this.tabla.getValueAt(vueloSeleccionado, 1).toString();
+			String clase = this.tablaInfoVuelo.getValueAt(claseSeleccionada, 1).toString();
+			IngresoDocumento in = new IngresoDocumento(numero,txtFechaIda.getText(), clase, Integer.toString(legajoEmpleado) ,passEmpleado );
+			in.setVisible(true);
+			
+			
+			
+		}
+		
+		
+
+	}
+
 	/**
 	 * Muestra un mensaje de error
+	 * 
 	 * @param msg Mensaje a mostrar
 	 */
 	void mostrarMensajeError(String msg) {
 		JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	void setInfoEmpleado(int legajo, String pass) {
+		this.legajoEmpleado = legajo;
+		this.passEmpleado = pass;
 	}
 
 }

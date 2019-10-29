@@ -121,13 +121,16 @@ public class InicioEmpleado extends javax.swing.JInternalFrame {
 
 						if (cantFilas == 1) {
 							activarConsultasEmpleado();
+							ventana.setInfoEmpleado(legajoNumerico, pass);
 						} else {
 							mostrarUsuarioIncorrecto();
 						}
-
+						
 					} catch (NumberFormatException e) {
 						mostrarLegajoNoNumerico();
 					}
+					
+					
 
 				} catch (SQLException e) {
 					mostrarMensajeError(e.getMessage());

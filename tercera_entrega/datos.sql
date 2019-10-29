@@ -46,22 +46,15 @@ INSERT INTO vuelos_programados VALUES("4000","BA2020","BB1010");
 INSERT INTO salidas VALUES ("3000","Ma","14:00","18:00","777"); 
 INSERT INTO salidas VALUES ("4000","Lu","13:00","17:00","333"); 
 INSERT INTO salidas VALUES ("3000","Mi","00:00","04:00","777");
+INSERT INTO salidas VALUES ("4000","Sa","01:00","05:00","333");
 
+/*
 #instancias vuelos
 INSERT INTO instancias_vuelo VALUES("3000","2020:09:15","Ma","Demorado");
 INSERT INTO instancias_vuelo VALUES("4000","2020:09:14","Lu","Demorado");
 INSERT INTO instancias_vuelo VALUES("3000","2020:09:16","Mi","En Horario");
 INSERT INTO instancias_vuelo VALUES("4000","2020:09:21","Lu","Demorado");
-
-
-#brinda
-INSERT INTO brinda VALUES("3000","Ma","Premium",01000.00,3);
-INSERT INTO brinda VALUES("3000","Ma","Turista",00200.00,5);
-INSERT INTO brinda VALUES("3000","Ma","Low Cost",00100.00,5);
-INSERT INTO brinda VALUES("3000","Mi","Premium",00200.00,3);
-INSERT INTO brinda VALUES("3000","Mi","Turista",00200.00,5);
-INSERT INTO brinda VALUES("3000","Mi","Low Cost",00200.00,5);
-INSERT INTO brinda VALUES("4000","Lu","Premium",10000.00,7);
+*/
 
 #posee
 INSERT INTO posee VALUES("Low Cost",10);
@@ -71,6 +64,14 @@ INSERT INTO posee VALUES("Premium",10);
 INSERT INTO posee VALUES("Premium",20);
 INSERT INTO posee VALUES("Premium",30);
 
+#brinda
+INSERT INTO brinda VALUES("3000","Ma","Premium",01000.00,3);
+INSERT INTO brinda VALUES("3000","Ma","Turista",00200.00,5);
+INSERT INTO brinda VALUES("3000","Ma","Low Cost",00100.00,5);
+INSERT INTO brinda VALUES("3000","Mi","Premium",00200.00,3);
+INSERT INTO brinda VALUES("3000","Mi","Turista",00200.00,5);
+INSERT INTO brinda VALUES("3000","Mi","Low Cost",00200.00,5);
+INSERT INTO brinda VALUES("4000","Lu","Premium",10000.00,7);
 
  
 

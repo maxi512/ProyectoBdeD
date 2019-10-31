@@ -174,7 +174,27 @@ public class VentanaConsultas extends javax.swing.JInternalFrame {
 	}
 
 	private void btnEjecutarActionPerformed(ActionEvent evt) {
-		this.refrescarTabla();
+		conectarBD();
+		
+		try {
+			
+			this.refrescarTabla();
+			Statement stmt = this.conexionBD.createStatement();
+			String sql = "SHOW TABLES;";
+			ResultSet rs = stmt.executeQuery(sql);
+
+			String nombres[] = obtenerContenidoFilas(rs);
+			
+			listaTablas.setListData(nombres);
+		}catch(SQLException e) {
+			
+			
+		}
+		
+		
+		
+		
+		
 	}
 	
 	private void thisComponentShown(ComponentEvent evt) {

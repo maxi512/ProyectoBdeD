@@ -8,6 +8,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -43,6 +44,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	private JRadioButton rdbtnIdayVuelta;
 	private JFormattedTextField txtFechaIda, txtFechaVuelta;
 	private ButtonGroup group;
+	private boolean seleccionVueloIda = false;
 	private DBTable tabla, tablaInfoVuelo;
 	private JList listOrigen, listDestino;
 	protected Connection conexionBD = null;
@@ -50,6 +52,10 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	private String passEmpleado;
 	protected int seleccionadoOrigen = -1;
 	protected int seleccionadoDestino = -1;
+	
+	private String numeroIda, claseIda;
+	private JButton btnBuscarVuelos = new JButton("Buscar vuelos");
+	private JButton btnReserva = new JButton("Realizar Reserva");
 
 	/**
 	 * Create the application.
@@ -167,6 +173,16 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 				tablaMouseClicked(evt);
 			}
 		});
+		
+		tablaInfoVuelo.addMouseListener(new MouseAdapter() {
+
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				actionTablaInfoVuelo();
+				
+			}
+		});
 
 		// setea la tabla solo para lectura, no se puede editar su contenido
 		tabla.setEditable(false);
@@ -178,12 +194,12 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		panel.add(tablaInfoVuelo);
 		pack();
 
-		JButton btnBuscarVuelos = new JButton("Buscar vuelos");
 		btnBuscarVuelos.setBounds(744, 197, 171, 31);
 		panel.add(btnBuscarVuelos);
 
-		JButton btnReserva = new JButton("Realizar Reserva");
 		btnReserva.setBounds(945, 91, 70, 70);
+		
+		btnReserva.setEnabled(false);
 
 		btnReserva.addActionListener(new ActionListener() {
 
@@ -218,6 +234,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 					refrescar();
 					tabla.setVisible(true);
 					tablaInfoVuelo.setVisible(false);
+					btnReserva.setEnabled(false);
 
 				}
 			}
@@ -273,6 +290,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 		}
 		return nombres;
 	}
+	
 
 	private void tablaMouseClicked(MouseEvent evt) {
 		if ((this.tabla.getSelectedRow() != -1) && (evt.getClickCount() == 2)) {
@@ -336,7 +354,8 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 			rs.close();
 			stmt.close();
-
+			
+			btnReserva.setEnabled(true);
 		} catch (SQLException ex) {
 			String msg = "SQLException: " + ex.getMessage() + "\n" + "SQLState: " + ex.getSQLState() + "\n"
 					+ "VendorError: " + ex.getErrorCode();
@@ -505,9 +524,84 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 
 			String numero = this.tabla.getValueAt(vueloSeleccionado, 1).toString();
 			String clase = this.tablaInfoVuelo.getValueAt(claseSeleccionada, 1).toString();
-			IngresoDocumento in = new IngresoDocumento(numero,txtFechaIda.getText(), clase, Integer.toString(legajoEmpleado) ,passEmpleado );
+			IngresoDocumento in = new IngresoDocumento(numero,txtFechaIda.getText(), clase, Integer.toString(legajoEmpleado));
 			in.setVisible(true);
 			
+		}
+		else {
+			/*
+			 * verificar vuelo
+			 * mostrar cartel
+			 * verificar
+			 * pasar info
+			 */
+			
+			if(!seleccionVueloIda) {
+				int vueloSeleccionado = this.tabla.getSelectedRow();
+				String ciudadSeleccionada = this.tabla.getValueAt(vueloSeleccionado, 2).toString();
+				
+				if(ciudadSeleccionada.equals(listOrigen.getSelectedValue().toString())) {
+					int claseSeleccionada = this.tablaInfoVuelo.getSelectedRow();
+
+					String numero = this.tabla.getValueAt(vueloSeleccionado, 1).toString();
+					String clase = this.tablaInfoVuelo.getValueAt(claseSeleccionada, 1).toString();
+					
+					this.numeroIda = numero;
+					this.claseIda = clase;
+					
+					JOptionPane.showMessageDialog(this, "Selecciono el vuelo de ida, por favor seleccione el vuelo de vuelta"
+							+ "", "Info", JOptionPane.INFORMATION_MESSAGE);
+					
+					this.seleccionVueloIda = true;
+					
+					listDestino.setEnabled(false);
+					listOrigen.setEnabled(false);
+					
+					txtFechaIda.setEnabled(false);
+					txtFechaVuelta.setEnabled(false);
+					
+					btnBuscarVuelos.setEnabled(false);
+					
+				}
+				
+				else {
+					mostrarMensajeError("Por favor seleccione primero el vuelo de ida.");
+				}
+			}
+			else {
+				int vueloSeleccionado = this.tabla.getSelectedRow();
+				String ciudadSeleccionada = this.tabla.getValueAt(vueloSeleccionado, 2).toString();
+				if(ciudadSeleccionada.equals(listDestino.getSelectedValue().toString())) {
+					
+					int claseSeleccionada = this.tablaInfoVuelo.getSelectedRow();
+
+					String numero = this.tabla.getValueAt(vueloSeleccionado, 1).toString();
+					String clase = this.tablaInfoVuelo.getValueAt(claseSeleccionada, 1).toString();
+					
+					IngresoDocumento in = new IngresoDocumento(numeroIda,numero,txtFechaIda.getText(),
+							txtFechaVuelta.getText(),claseIda,clase,Integer.toString(legajoEmpleado));
+					
+					
+					in.setVisible(true);
+					
+					listDestino.setEnabled(true);
+					listOrigen.setEnabled(true);
+					
+					txtFechaIda.setEnabled(true);
+					txtFechaVuelta.setEnabled(true);
+					
+					btnBuscarVuelos.setEnabled(true);
+					
+					btnReserva.setEnabled(false);
+					
+					this.seleccionVueloIda = false;
+					
+				}
+				
+				else {
+					mostrarMensajeError("Por favor seleccione el vuelo de vuelta.");
+				}
+			}
 			
 			
 		}
@@ -528,6 +622,12 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 	void setInfoEmpleado(int legajo, String pass) {
 		this.legajoEmpleado = legajo;
 		this.passEmpleado = pass;
+	}
+	
+
+	private void actionTablaInfoVuelo() {
+		//Activar boton
+		
 	}
 
 }

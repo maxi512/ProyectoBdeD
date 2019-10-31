@@ -18,7 +18,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 	private JMenuBar menuBar;
 
 	private JMenu mnuOperaciones;
-	private JMenuItem mniConsultaAdmin, mniReserva;
+	private JMenuItem mniConsultaAdmin;
 	private JMenuItem mniConsultaEmpleado;
 	private JSeparator separator;
 	private JMenuItem mniSalir;
@@ -107,9 +107,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 			});
 			// SETEAR LISTENER
 
-			mniReserva = new JMenuItem();
-			mnuOperaciones.add(mniReserva);
-			mniReserva.setText("Realizar Reserva");
 			
 			separator = new JSeparator();
 			mnuOperaciones.add(separator);

@@ -21,7 +21,8 @@ public class IngresoDocumento extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JFrame frame;
-	private String numero, fecha, clase, legajo, pass;
+	private String numeroIda, fechaIda, claseIda, legajo;
+	private String numeroVuelta, fechaVuelta, claseVuelta;
 	private JTextField tipoDoc;
 	private JTextField nroDni;
 	private boolean soloIda;
@@ -30,31 +31,43 @@ public class IngresoDocumento extends JFrame {
 	/**
 	 * Create the application.
 	 */
-	public IngresoDocumento(String numero, String fecha, String clase, String legajo, String pass) {
-		initialize(numero, fecha, clase, legajo, pass);
+	public IngresoDocumento(String numero, String fecha, String clase, String legajo) {
+		this.soloIda = true;
+		this.numeroIda = numero;
+		this.fechaIda = fecha;
+		this.claseIda = clase;
+		this.legajo = legajo;
+
+		initialize();
+
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+
 	}
-	
-	public IngresoDocumento(String numero, String fechaIda, String fechaVuelta, String clase, String legajo, String pass) {
-		initialize(numero, fecha, clase, legajo, pass);
+
+	public IngresoDocumento(String numeroIda, String numeroVuelta, String fechaIda, String fechaVuelta, String claseIda,
+			String claseVuelta, String legajo) {
+
+		this.numeroIda = numeroIda;
+		this.fechaIda = fechaIda;
+		this.claseIda = claseIda;
+		this.numeroVuelta = numeroVuelta;
+		this.fechaVuelta = fechaVuelta;
+		this.claseVuelta = claseVuelta;
+		this.legajo = legajo;
+
+		initialize();
+
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize(String numero, String fecha, String clase, String legajo, String pass) {
-
-		this.numero = numero;
-		this.fecha = fecha;
-		this.clase = clase;
-		this.legajo = legajo;
-		this.pass = pass;
+	private void initialize() {
 
 		frame = new JFrame();
-		this.setBounds(100, 100, 450, 300);
+		this.setBounds(300, 150, 450, 300);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.getContentPane().setLayout(null);
 
@@ -95,27 +108,32 @@ public class IngresoDocumento extends JFrame {
 			conectarBD();
 			try {
 				Statement stmt = this.conexionBD.createStatement();
-				java.sql.Date fechaIda = Fechas.convertirStringADateSQL(this.fecha.trim());
+				java.sql.Date fechaIda = Fechas.convertirStringADateSQL(this.fechaIda.trim());
 				String sql = "";
-				
-				sql = "call reservarVueloIda('" + numero + "', '" + fechaIda + "', '" + clase + "', '" + tipoDoc.getText()
-				+ "', '" + nroDni.getText() + "', " + Integer.parseInt(legajo) + " );";
-				
-				
-				
-				
+
+				if (soloIda)
+					sql = "call reservarVueloIda('" + numeroIda + "', '" + fechaIda + "', '" + claseIda + "', '"
+							+ tipoDoc.getText() + "', '" + nroDni.getText() + "', " + Integer.parseInt(legajo) + " );";
+
+				else {
+					java.sql.Date fechaVuelta = Fechas.convertirStringADateSQL(this.fechaVuelta.trim());
+					sql = "call reservarVueloIdaVuelta('" + numeroIda + "', '" + numeroVuelta + "', '" + fechaIda + "', '"
+							+ fechaVuelta + "', '" + claseIda + "', '" + claseVuelta + "', '" + tipoDoc.getText() + "', '"
+							+ nroDni.getText() + "', " + Integer.parseInt(legajo) + " );";
+				}
+
 				System.out.println(sql);
 				ResultSet st = stmt.executeQuery(sql);
 				st.first();
 				JOptionPane.showMessageDialog(this, st.getString(1), "Info", JOptionPane.OK_OPTION);
 				this.setVisible(false);
-				
+
 			} catch (SQLException e) {
-				mostrarMensajeError("No se pudo realizar la reserva\n"+ e.getMessage());
+				mostrarMensajeError("No se pudo realizar la reserva\n" + e.getMessage());
 			}
 
 		} else {
-			
+
 		}
 
 	}
@@ -134,7 +152,7 @@ public class IngresoDocumento extends JFrame {
 				this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
 			} catch (SQLException ex) {
 				String msg = "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage();
-				
+
 				mostrarMensajeError(msg);
 
 			}
@@ -152,6 +170,7 @@ public class IngresoDocumento extends JFrame {
 			}
 		}
 	}
+
 	void mostrarMensajeError(String msg) {
 		JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
 	}

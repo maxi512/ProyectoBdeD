@@ -13,8 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import com.sun.jdi.connect.spi.Connection;
-
 import javax.swing.JButton;
 
 public class IngresoDocumento extends JFrame {

@@ -206,6 +206,7 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				accionBotonReserva();
+				tablaInfoVuelo.setVisible(false);
 			}
 		});
 		panel.add(btnReserva);
@@ -562,6 +563,9 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 					
 					btnBuscarVuelos.setEnabled(false);
 					
+					rdbtnIda.setEnabled(false);
+					rdbtnIdayVuelta.setEnabled(false);
+					
 				}
 				
 				else {
@@ -593,6 +597,9 @@ public class VentanaInfoVuelos extends javax.swing.JInternalFrame {
 					btnBuscarVuelos.setEnabled(true);
 					
 					btnReserva.setEnabled(false);
+					
+					rdbtnIda.setEnabled(true);
+					rdbtnIdayVuelta.setEnabled(true);
 					
 					this.seleccionVueloIda = false;
 					
